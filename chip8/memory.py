@@ -15,23 +15,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import argparse
-import pathlib
-
-from .memory import Memory
-
-parser = argparse.ArgumentParser(description="CHIP-8 emulator")
-parser.add_argument("rom", help="Path to the ROM file", type=pathlib.Path)
-parser.add_argument("--debug", help="Enable debug output", default=False, action="store_true")
+MEM_SIZE = 4096
+FONT_START = 0
+ROM_START = 0x200
 
 
-def main():
-    args = parser.parse_args()
-    memory = Memory()
+class Memory(bytearray):
+    def __init__(self):
+        super().__init__(MEM_SIZE)
 
-    with args.rom.open("rb") as fd:
-        memory.load_rom(fd.read())
+    def reset(self):
+        self.__init__()
 
-    if args.debug:
-        print("ROM:")
-        print(memory)
+    def load_font(self, font):
+        for offset, byte in enumerate(font):
+            self[FONT_START + offset] = byte
+
+    def load_rom(self, rom):
+        for offset, byte in enumerate(rom):
+            self[ROM_START + offset] = byte
+
