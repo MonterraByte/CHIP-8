@@ -33,5 +33,5 @@ def main():
         memory.load_rom(fd.read())
 
     if args.debug:
-        print("ROM:")
+        print("Memory:")
         print(memory)
