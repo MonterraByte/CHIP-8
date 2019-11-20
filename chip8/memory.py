@@ -35,3 +35,12 @@ class Memory(bytearray):
         for offset, byte in enumerate(rom):
             self[ROM_START + offset] = byte
 
+    def __str__(self):
+        s = ""
+        for address, data in enumerate(self):
+            if address % 16 == 0:
+                s += f"\n{address:03X}: {data:02X}"
+            else:
+                s += f" {data:02X}"
+        return s[1:]
+
