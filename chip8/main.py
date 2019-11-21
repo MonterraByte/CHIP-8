@@ -18,6 +18,7 @@
 import argparse
 import pathlib
 
+from .font import FONT_DATA
 from .memory import Memory
 
 parser = argparse.ArgumentParser(description="CHIP-8 emulator")
@@ -28,6 +29,8 @@ parser.add_argument("--debug", help="Enable debug output", default=False, action
 def main():
     args = parser.parse_args()
     memory = Memory()
+
+    memory.load_font(FONT_DATA)
 
     with args.rom.open("rb") as fd:
         memory.load_rom(fd.read())
