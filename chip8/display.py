@@ -15,28 +15,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import argparse
-import pathlib
-
-from .display import VideoMemory
-from .font import FONT_DATA
-from .memory import Memory
-
-parser = argparse.ArgumentParser(description="CHIP-8 emulator")
-parser.add_argument("rom", help="Path to the ROM file", type=pathlib.Path)
-parser.add_argument("--debug", help="Enable debug output", default=False, action="store_true")
+DISPLAY_WIDTH = 64
+DISPLAY_HEIGHT = 32
 
 
-def main():
-    args = parser.parse_args()
-    memory = Memory()
-    video_memory = VideoMemory()
+class VideoMemory(bytearray):
+    def __init__(self):
+        super().__init__(DISPLAY_WIDTH * DISPLAY_HEIGHT)
 
-    memory.load_font(FONT_DATA)
+    def reset(self):
+        self.__init__()
 
-    with args.rom.open("rb") as fd:
-        memory.load_rom(fd.read())
+    def __str__(self):
+        s = ""
+        for address, data in enumerate(self):
+            if address % DISPLAY_WIDTH == 0:
+                s += "\n"
 
-    if args.debug:
-        print("Memory:")
-        print(memory)
+            if data:
+                s += "█"
+            else:
+                s += "░"
+        return s[1:]
