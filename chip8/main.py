@@ -26,6 +26,8 @@ from .emulator import Emulator
 
 from .window import Ui_MainWindow
 
+FRAME_INTERVAL = 166
+
 parser = argparse.ArgumentParser(description="CHIP-8 emulator")
 parser.add_argument("rom", help="Path to the ROM file", type=pathlib.Path, nargs="?")
 parser.add_argument("--debug", help="Enable debug output", default=False, action="store_true")
@@ -53,9 +55,15 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.debug = args.debug
 
+        self.timer = QtCore.QTimer(self)
+        self.timer.setInterval(FRAME_INTERVAL)
+
         self.emulator = None
         if args.rom:
             self.new_emulator(args.rom)
+            self.timer.start()
+
+        self.actionPause.toggled.connect(self.toggle_emulation)
 
     def resizeEvent(self, event: QtGui.QResizeEvent):
         QtWidgets.QMainWindow.resizeEvent(self, event)
@@ -70,6 +78,14 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.graphicsPixmapItem.setPixmap(self.pixmap)
 
     @QtCore.Slot()
+    def toggle_emulation(self, checked):
+        if checked:
+            self.timer.stop()
+        else:
+            self.timer.start()
+
+
+    @QtCore.Slot()
     def open_rom(self):
         rom_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select ROM")
         if rom_path:
@@ -82,6 +98,8 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         with rom_path.open("rb") as fd:
             self.emulator = Emulator(fd.read(), self.debug)
         self.emulator.display_changed.connect(self.draw)
+        self.timer.timeout.connect(self.emulator.run_once)
+        self.actionPause.setChecked(False)
 
 
 def main():
