@@ -23,7 +23,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 
 from .display import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from .emulator import Emulator
-
+from .error import Ui_ErrorWindow
 from .window import Ui_MainWindow
 
 FRAME_INTERVAL = 166
@@ -38,6 +38,8 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         super().__init__(parent=None)
         self.setupUi(self)
         self.setCentralWidget(self.graphicsView)
+
+        self.error_window = ErrorWindow(self)
 
         self.scale_factor = 1
 
@@ -84,7 +86,6 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             self.timer.start()
 
-
     @QtCore.Slot()
     def open_rom(self):
         rom_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select ROM")
@@ -98,8 +99,55 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         with rom_path.open("rb") as fd:
             self.emulator = Emulator(fd.read(), self.debug)
         self.emulator.display_changed.connect(self.draw)
+        self.emulator.emulation_error.connect(self.report_error)
         self.timer.timeout.connect(self.emulator.run_once)
         self.actionPause.setChecked(False)
+        self.toggle_emulation(False)
+
+    @QtCore.Slot(Exception)
+    def report_error(self, error: Exception):
+        self.actionPause.setChecked(True)
+        self.toggle_emulation(True)
+        self.error_window.show_error(str(error))
+
+    @QtCore.Slot()
+    def error_reported(self):
+        self.error_window.hide()
+        self.actionPause.setChecked(False)
+        self.toggle_emulation(False)
+
+    @QtCore.Slot()
+    def restart(self):
+        import ctypes
+        import os
+
+        argc = ctypes.c_int()
+        argv = ctypes.POINTER(ctypes.c_wchar_p)()
+        ctypes.pythonapi.Py_GetArgcArgv(ctypes.byref(argc), ctypes.byref(argv))
+
+        arguments = []
+        for i in range(argc.value):
+            arguments.append(argv[i])
+
+        os.execv(sys.executable, arguments)
+
+    def closeEvent(self, event: QtGui.QCloseEvent):
+        self.error_window.close()
+        QtWidgets.QMainWindow.closeEvent(self, event)
+
+
+class ErrorWindow(QtWidgets.QDialog, Ui_ErrorWindow):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setupUi(self)
+
+        self.continuePushButton.clicked.connect(parent.error_reported)
+        self.exitPushButton.clicked.connect(parent.close)
+        self.restartPushButton.clicked.connect(parent.restart)
+
+    def show_error(self, error: str):
+        self.label.setText(error)
+        self.show()
 
 
 def main():

@@ -35,7 +35,7 @@ class UnimplementedInstruction(Exception):
 
 class Emulator(QtCore.QObject):
     display_changed = QtCore.Signal()
-    unimplemented_instruction = QtCore.Signal(UnimplementedInstruction)
+    emulation_error = QtCore.Signal(Exception)
 
     def __init__(self, rom, debug=False):
         super().__init__()
@@ -68,6 +68,6 @@ class Emulator(QtCore.QObject):
             self.program_counter = instruction & 0x0FFF
         else:
             exception = UnimplementedInstruction(instruction, self.program_counter-2)
-            self.unimplemented_instruction.emit(exception)
+            self.emulation_error.emit(exception)
             raise exception
 
