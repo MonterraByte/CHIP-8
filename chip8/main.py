@@ -17,15 +17,67 @@
 
 import argparse
 import pathlib
+import sys
 
+from PySide2 import QtCore, QtGui, QtWidgets
+
+from .display import DISPLAY_WIDTH, DISPLAY_HEIGHT
 from .emulator import Emulator
+
+from .window import Ui_MainWindow
 
 parser = argparse.ArgumentParser(description="CHIP-8 emulator")
 parser.add_argument("rom", help="Path to the ROM file", type=pathlib.Path)
 parser.add_argument("--debug", help="Enable debug output", default=False, action="store_true")
 
 
+class Window(QtWidgets.QMainWindow, Ui_MainWindow):
+    def __init__(self, args: argparse.Namespace):
+        super().__init__(parent=None)
+        self.setupUi(self)
+        self.setCentralWidget(self.graphicsView)
+
+        self.image = QtGui.QImage(QtCore.QSize(DISPLAY_WIDTH, DISPLAY_HEIGHT), QtGui.QImage.Format_Mono)
+        self.image.fill(0)
+        self.pixmap = QtGui.QPixmap.fromImage(self.image)
+        self.graphicsScene = QtWidgets.QGraphicsScene(self)
+        self.graphicsPixmapItem = self.graphicsScene.addPixmap(self.pixmap)
+        self.graphicsView.setScene(self.graphicsScene)
+
+        self.close_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence(QtGui.QKeySequence.Quit), self)
+        self.close_shortcut.activated.connect(self.close)
+        self.actionExit.triggered.connect(self.close)
+        self.actionOpen.triggered.connect(self.open_rom)
+
+        self.debug = args.debug
+
+        self.emulator = None
+        self.new_emulator(args.rom)
+
+    @QtCore.Slot()
+    def draw(self):
+        self.emulator.video_memory.draw(self.image)
+        self.pixmap = QtGui.QPixmap.fromImage(self.image)
+        self.graphicsPixmapItem.setPixmap(self.pixmap)
+
+    @QtCore.Slot()
+    def open_rom(self):
+        rom_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select ROM")
+        if rom_path:
+            self.new_emulator(pathlib.Path(rom_path))
+
+    def new_emulator(self, rom_path: pathlib.Path):
+        if self.emulator is not None:
+            self.emulator.display_changed.disconnect(self.draw)
+
+        with rom_path.open("rb") as fd:
+            self.emulator = Emulator(fd.read(), self.debug)
+        self.emulator.display_changed.connect(self.draw)
+
+
 def main():
-    args = parser.parse_args()
-    with args.rom.open("rb") as fd:
-        emulator = Emulator(fd.read(), args.debug)
+    args, unparsed_args = parser.parse_known_args()
+    app = QtWidgets.QApplication(sys.argv[:1] + unparsed_args)
+    window = Window(args)
+    window.show()
+    sys.exit(app.exec_())

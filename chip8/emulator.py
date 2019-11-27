@@ -15,13 +15,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from PySide2 import QtCore
+
 from .display import VideoMemory
 from .font import FONT_DATA
 from .memory import Memory
 
 
-class Emulator:
+class Emulator(QtCore.QObject):
+    display_changed = QtCore.Signal()
+
     def __init__(self, rom, debug=False):
+        super().__init__()
         self.debug = debug
 
         self.memory = Memory()

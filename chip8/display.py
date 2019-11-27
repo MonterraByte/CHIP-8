@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from PySide2.QtGui import QImage
+
 DISPLAY_WIDTH = 64
 DISPLAY_HEIGHT = 32
 
@@ -22,6 +24,15 @@ DISPLAY_HEIGHT = 32
 class VideoMemory(bytearray):
     def __init__(self):
         super().__init__(DISPLAY_WIDTH * DISPLAY_HEIGHT)
+
+    def draw(self, image: QImage):
+        for address, data in enumerate(self):
+            x = address % DISPLAY_WIDTH
+            y = address // DISPLAY_WIDTH
+            if data:
+                image.setPixel(x, y, 1)
+            else:
+                image.setPixel(x, y, 0)
 
     def reset(self):
         self.__init__()
