@@ -27,7 +27,7 @@ from .emulator import Emulator
 from .window import Ui_MainWindow
 
 parser = argparse.ArgumentParser(description="CHIP-8 emulator")
-parser.add_argument("rom", help="Path to the ROM file", type=pathlib.Path)
+parser.add_argument("rom", help="Path to the ROM file", type=pathlib.Path, nargs="?")
 parser.add_argument("--debug", help="Enable debug output", default=False, action="store_true")
 
 
@@ -54,7 +54,8 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.debug = args.debug
 
         self.emulator = None
-        self.new_emulator(args.rom)
+        if args.rom:
+            self.new_emulator(args.rom)
 
     def resizeEvent(self, event: QtGui.QResizeEvent):
         QtWidgets.QMainWindow.resizeEvent(self, event)
