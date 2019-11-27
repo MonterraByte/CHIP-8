@@ -37,6 +37,8 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setCentralWidget(self.graphicsView)
 
+        self.scale_factor = 1
+
         self.image = QtGui.QImage(QtCore.QSize(DISPLAY_WIDTH, DISPLAY_HEIGHT), QtGui.QImage.Format_Mono)
         self.image.fill(0)
         self.pixmap = QtGui.QPixmap.fromImage(self.image)
@@ -54,10 +56,16 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.emulator = None
         self.new_emulator(args.rom)
 
+    def resizeEvent(self, event: QtGui.QResizeEvent):
+        QtWidgets.QMainWindow.resizeEvent(self, event)
+
+        self.scale_factor = min(self.graphicsView.width() // DISPLAY_WIDTH, self.graphicsView.height() // DISPLAY_HEIGHT)
+
     @QtCore.Slot()
     def draw(self):
         self.emulator.video_memory.draw(self.image)
-        self.pixmap = QtGui.QPixmap.fromImage(self.image)
+        self.pixmap = QtGui.QPixmap.fromImage(self.image).scaled(QtCore.QSize(DISPLAY_WIDTH * self.scale_factor,
+                                                                              DISPLAY_HEIGHT * self.scale_factor))
         self.graphicsPixmapItem.setPixmap(self.pixmap)
 
     @QtCore.Slot()
