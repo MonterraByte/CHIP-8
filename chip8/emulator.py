@@ -123,6 +123,18 @@ class Emulator(QtCore.QObject):
             value = value % 100
             self.memory[self.index_register + 1] = value // 10
             self.memory[self.index_register + 2] = value % 10
+        elif instruction & 0xF0FF == 0xF055:
+            # Store registers in memory
+            if self.debug:
+                print(f"[{instruction:04X}] Moving the first {((instruction & 0x0F00) >> 8) + 1} registers to memory address {self.index_register:03X}")
+            for i in range(((instruction & 0x0F00) >> 8) + 1):
+                self.memory[self.index_register + i] = self.v[i]
+        elif instruction & 0xF0FF == 0xF065:
+            # Read registers from memory
+            if self.debug:
+                print(f"[{instruction:04X}] Moving value from memory address {self.index_register:03X} to the first {((instruction & 0x0F00) >> 8) + 1} registers")
+            for i in range(((instruction & 0x0F00) >> 8) + 1):
+                self.v[i] = self.memory[self.index_register + i]
         else:
             exception = UnimplementedInstruction(instruction, self.program_counter-2)
             self.emulation_error.emit(exception)
