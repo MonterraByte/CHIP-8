@@ -122,6 +122,11 @@ class Emulator(QtCore.QObject):
                 self.v[0xF] = 0
 
             self.display_changed.emit()
+        elif instruction & 0xF0FF == 0xF007:
+            # Load delay register
+            if self.debug:
+                print(f"[{instruction:04X}] Loading register {(instruction & 0x0F00) >> 8:X} with the value of the delay timer ({self.delay_timer})")
+            self.v[(instruction & 0x0F00) >> 8] = self.delay_timer
         elif instruction & 0xF0FF == 0xF015:
             # Load delay register
             if self.debug:
