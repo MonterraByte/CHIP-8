@@ -78,6 +78,27 @@ class Emulator(QtCore.QObject):
             if self.debug:
                 print(f"[{instruction:04X}] Moving {instruction & 0x0FFF:03X} to the index register")
             self.index_register = instruction & 0x0FFF
+        elif instruction & 0xF000 == 0xD000:
+            # Draw sprite.
+            x = self.v[(instruction & 0x0F00) >> 8]
+            y = self.v[(instruction & 0x00F0) >> 4]
+
+            if self.debug:
+                print(f"[{instruction:04X}] Drawing sprite from memory address {self.index_register:03X} ({instruction & 0x000F} tall) at coordinates {x}, {y}")
+
+            collision = False
+            for i in range(instruction & 0x000F):
+                sprite = self.memory[self.index_register + i]
+                collision = collision or self.video_memory.draw_sprite_line(x, y + i, sprite)
+
+            if collision:
+                if self.debug:
+                    print(f"[{instruction:04X}] Sprite collision detected")
+                self.v[0xF] = 1
+            else:
+                self.v[0xF] = 0
+
+            self.display_changed.emit()
         else:
             exception = UnimplementedInstruction(instruction, self.program_counter-2)
             self.emulation_error.emit(exception)

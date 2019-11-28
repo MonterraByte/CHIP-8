@@ -34,6 +34,20 @@ class VideoMemory(bytearray):
             else:
                 image.setPixel(x, y, 0)
 
+    def draw_sprite_line(self, x, y, sprite_line):
+        collision = False
+        for offset in range(8):
+            current_value = self[(DISPLAY_WIDTH * y) + x + offset]
+            new_value = ((sprite_line & (0b10000000 >> offset)) >> 7 - offset)
+
+            if current_value and new_value:
+                collision = True
+                self[(DISPLAY_WIDTH * y) + x + offset] = 0
+            elif new_value:
+                self[(DISPLAY_WIDTH * y) + x + offset] = 1
+
+        return collision
+
     def reset(self):
         self.__init__()
 
