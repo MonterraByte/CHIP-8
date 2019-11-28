@@ -68,6 +68,11 @@ class Emulator(QtCore.QObject):
             if self.debug:
                 print(f"[{instruction:04X}] Jumping to address {instruction & 0x0FFF:03X}")
             self.program_counter = instruction & 0x0FFF
+        elif instruction & 0xF000 == 0x6000:
+            # Move value to register
+            if self.debug:
+                print(f"[{instruction:04X}] Moving {instruction & 0x00FF:02X} to register {(instruction & 0x0F00) >> 8:X}")
+            self.v[(instruction & 0x0F00) >> 8] = instruction & 0x00FF
         else:
             exception = UnimplementedInstruction(instruction, self.program_counter-2)
             self.emulation_error.emit(exception)
