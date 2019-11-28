@@ -43,7 +43,7 @@ class Emulator(QtCore.QObject):
 
         self.v = [0] * 16
         self.program_counter = PROGRAM_COUNTER_START
-        self.address_register = 0
+        self.index_register = 0
         self.stack_pointer = 0
         self.delay_timer = 0
         self.sound_timer = 0
@@ -73,6 +73,11 @@ class Emulator(QtCore.QObject):
             if self.debug:
                 print(f"[{instruction:04X}] Moving {instruction & 0x00FF:02X} to register {(instruction & 0x0F00) >> 8:X}")
             self.v[(instruction & 0x0F00) >> 8] = instruction & 0x00FF
+        elif instruction & 0xF000 == 0xA000:
+            # Move value to the index register.
+            if self.debug:
+                print(f"[{instruction:04X}] Moving {instruction & 0x0FFF:03X} to the index register")
+            self.index_register = instruction & 0x0FFF
         else:
             exception = UnimplementedInstruction(instruction, self.program_counter-2)
             self.emulation_error.emit(exception)
