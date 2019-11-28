@@ -112,6 +112,16 @@ class Emulator(QtCore.QObject):
                 self.v[0xF] = 0
 
             self.display_changed.emit()
+        elif instruction & 0xF0FF == 0xF015:
+            # Load delay register
+            if self.debug:
+                print(f"[{instruction:04X}] Loading the delay timer with value {(instruction & 0x0F00) >> 8}")
+            self.delay_timer = (instruction & 0x0F00) >> 8
+        elif instruction & 0xF0FF == 0xF018:
+            # Load delay register
+            if self.debug:
+                print(f"[{instruction:04X}] Loading the sound timer with value {(instruction & 0x0F00) >> 8}")
+            self.sound_timer = (instruction & 0x0F00) >> 8
         elif instruction & 0xF0FF == 0xF029:
             # Load index register with the location of the font for the value in the register
             if self.debug:
