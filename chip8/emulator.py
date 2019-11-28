@@ -86,6 +86,13 @@ class Emulator(QtCore.QObject):
             if self.debug:
                 print(f"[{instruction:04X}] Moving {instruction & 0x00FF:02X} to register {(instruction & 0x0F00) >> 8:X}")
             self.v[(instruction & 0x0F00) >> 8] = instruction & 0x00FF
+        elif instruction & 0xF000 == 0x7000:
+            # Add value to register (wrapping addition, no carry)
+            if self.debug:
+                print(f"[{instruction:04X}] Adding {instruction & 0x00FF:02X} to register {(instruction & 0x0F00) >> 8:X} (carry discarded)")
+            self.v[(instruction & 0x0F00) >> 8] += instruction & 0x00FF
+            while self.v[(instruction & 0x0F00) >> 8] > 255:
+                self.v[(instruction & 0x0F00) >> 8] -= 255
         elif instruction & 0xF000 == 0xA000:
             # Move value to the index register.
             if self.debug:
