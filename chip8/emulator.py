@@ -22,6 +22,7 @@ from .font import FONT_DATA
 from .memory import Memory, FONT_START
 
 PROGRAM_COUNTER_START = 512
+STACK_POINTER_START = 82
 
 
 class UnimplementedInstruction(Exception):
@@ -44,7 +45,7 @@ class Emulator(QtCore.QObject):
         self.v = [0] * 16
         self.program_counter = PROGRAM_COUNTER_START
         self.index_register = 0
-        self.stack_pointer = 0
+        self.stack_pointer = STACK_POINTER_START
         self.delay_timer = 0
         self.sound_timer = 0
 
