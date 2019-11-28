@@ -84,6 +84,24 @@ class Emulator(QtCore.QObject):
 
             self.stack_pointer += 2
             self.program_counter = instruction & 0x0FFF
+        elif instruction & 0xF000 == 0x3000:
+            # Skip the next instruction if the source register equals value.
+            if self.debug:
+                print(f"[{instruction:04X}] Conditional skip if register {(instruction & 0x0F00) >> 8:X} equals {instruction & 0x00FF:02X} ({self.v[(instruction & 0x0F00) >> 8] == instruction & 0x00FF})")
+            if self.v[(instruction & 0x0F00) >> 8] == instruction & 0x00FF:
+                self.program_counter += 2
+        elif instruction & 0xF000 == 0x4000:
+            # Skip the next instruction if the source register does not equal value.
+            if self.debug:
+                print(f"[{instruction:04X}] Conditional skip if register {(instruction & 0x0F00) >> 8:X} does not equal {instruction & 0x00FF:02X} ({self.v[(instruction & 0x0F00) >> 8] != instruction & 0x00FF})")
+            if self.v[(instruction & 0x0F00) >> 8] != instruction & 0x00FF:
+                self.program_counter += 2
+        elif instruction & 0xF00F == 0x5000:
+            # Skip the next instruction if the registers have the same value.
+            if self.debug:
+                print(f"[{instruction:04X}] Conditional skip if the values of the registers {(instruction & 0x0F00) >> 8:X} and {(instruction & 0x00F0) >> 4:X} are equal ({self.v[(instruction & 0x0F00) >> 8] == self.v[(instruction & 0x00F0) >> 4]})")
+            if self.v[(instruction & 0x0F00) >> 8] == self.v[(instruction & 0x00F0) >> 4]:
+                self.program_counter += 2
         elif instruction & 0xF000 == 0x6000:
             # Move value to register
             if self.debug:
@@ -96,6 +114,12 @@ class Emulator(QtCore.QObject):
             self.v[(instruction & 0x0F00) >> 8] += instruction & 0x00FF
             while self.v[(instruction & 0x0F00) >> 8] > 255:
                 self.v[(instruction & 0x0F00) >> 8] -= 255
+        elif instruction & 0xF00F == 0x9000:
+            # Skip the next instruction if the registers have different values.
+            if self.debug:
+                print(f"[{instruction:04X}] Conditional skip if the values of the registers {(instruction & 0x0F00) >> 8:X} and {(instruction & 0x00F0) >> 4:X} differ ({self.v[(instruction & 0x0F00) >> 8] == self.v[(instruction & 0x00F0) >> 4]})")
+            if self.v[(instruction & 0x0F00) >> 8] != self.v[(instruction & 0x00F0) >> 4]:
+                self.program_counter += 2
         elif instruction & 0xF000 == 0xA000:
             # Move value to the index register.
             if self.debug:
