@@ -68,6 +68,8 @@ class Emulator(QtCore.QObject):
             # Return from subroutine.
             self.stack_pointer -= 2
             self.program_counter = int.from_bytes(self.memory[self.stack_pointer:self.stack_pointer+2], byteorder="big")
+            if self.debug:
+                print(f"[{instruction:04X}] Returning from subroutine to address {self.program_counter:04X}")
         elif instruction & 0xF000 == 0x1000:
             # Jump to address.
             if self.debug:
@@ -77,7 +79,7 @@ class Emulator(QtCore.QObject):
             # Call subroutine.
             if self.debug:
                 print(f"[{instruction:04X}] Calling subroutine at address {instruction & 0x0FFF:03X}")
-            return_address = int.to_bytes(self.program_counter - 2, 2, byteorder="big")
+            return_address = int.to_bytes(self.program_counter, 2, byteorder="big")
             self.memory[self.stack_pointer:self.stack_pointer+2] = return_address
 
             self.stack_pointer += 2
