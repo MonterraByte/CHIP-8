@@ -63,10 +63,23 @@ class Emulator(QtCore.QObject):
         instruction = int.from_bytes(self.memory[self.program_counter:self.program_counter+2], byteorder="big")
         self.program_counter += 2
 
-        if instruction & 0xF000 == 0x1000:
+        if instruction == 0x00EE:
+            # Return from subroutine.
+            self.stack_pointer -= 2
+            self.program_counter = int.from_bytes(self.memory[self.stack_pointer:self.stack_pointer+2], byteorder="big")
+        elif instruction & 0xF000 == 0x1000:
             # Jump to address.
             if self.debug:
                 print(f"[{instruction:04X}] Jumping to address {instruction & 0x0FFF:03X}")
+            self.program_counter = instruction & 0x0FFF
+        elif instruction & 0xF000 == 0x2000:
+            # Call subroutine.
+            if self.debug:
+                print(f"[{instruction:04X}] Calling subroutine at address {instruction & 0x0FFF:03X}")
+            return_address = int.to_bytes(self.program_counter - 2, 2, byteorder="big")
+            self.memory[self.stack_pointer:self.stack_pointer+2] = return_address
+
+            self.stack_pointer += 2
             self.program_counter = instruction & 0x0FFF
         elif instruction & 0xF000 == 0x6000:
             # Move value to register
