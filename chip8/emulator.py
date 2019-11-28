@@ -112,6 +112,17 @@ class Emulator(QtCore.QObject):
                 self.v[0xF] = 0
 
             self.display_changed.emit()
+        elif instruction & 0xF0FF == 0xF033:
+            # Store the binary coded decimal representation of the value in the specified register in memory
+            value = self.v[(instruction & 0x0F00) >> 8]
+
+            if self.debug:
+                print(f"[{instruction:04X}] Storing BCD representation of value {value} from register {(instruction & 0x0F00) >> 8:X} to address {self.index_register:03X}")
+
+            self.memory[self.index_register] = value // 100
+            value = value % 100
+            self.memory[self.index_register + 1] = value // 10
+            self.memory[self.index_register + 2] = value % 10
         else:
             exception = UnimplementedInstruction(instruction, self.program_counter-2)
             self.emulation_error.emit(exception)
