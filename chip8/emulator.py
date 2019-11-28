@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from random import randint
+
 from PySide2 import QtCore
 
 from .display import VideoMemory
@@ -125,6 +127,14 @@ class Emulator(QtCore.QObject):
             if self.debug:
                 print(f"[{instruction:04X}] Moving {instruction & 0x0FFF:03X} to the index register")
             self.index_register = instruction & 0x0FFF
+        elif instruction & 0xF000 == 0xC000:
+            # Move value to the index register.
+            rand = randint(0, 255)
+            if self.debug:
+                print(f"[{instruction:04X}] Performing AND between a random number (0x{rand:02X})"
+                      f" and the value {instruction & 0x00FF:02X}, storing the result in "
+                      f"register {(instruction & 0x0F00) >> 8:X}")
+            self.v[(instruction & 0x0F00) >> 8] = rand & (instruction & 0x00FF)
         elif instruction & 0xF000 == 0xD000:
             # Draw sprite.
             x = self.v[(instruction & 0x0F00) >> 8]
