@@ -19,7 +19,7 @@ from PySide2 import QtCore
 
 from .display import VideoMemory
 from .font import FONT_DATA
-from .memory import Memory
+from .memory import Memory, FONT_START
 
 PROGRAM_COUNTER_START = 512
 
@@ -112,6 +112,11 @@ class Emulator(QtCore.QObject):
                 self.v[0xF] = 0
 
             self.display_changed.emit()
+        elif instruction & 0xF0FF == 0xF029:
+            # Load index register with the location of the font for the value in the register
+            if self.debug:
+                print(f"[{instruction:04X}] Loading the index register with the address of the font for {self.v[(instruction & 0x0F00) >> 8]} from register {(instruction & 0x0F00) >> 8:X}")
+            self.index_register = FONT_START + self.v[(instruction & 0x0F00) >> 8] * 5
         elif instruction & 0xF0FF == 0xF033:
             # Store the binary coded decimal representation of the value in the specified register in memory
             value = self.v[(instruction & 0x0F00) >> 8]
