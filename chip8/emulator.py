@@ -117,6 +117,12 @@ class Emulator(QtCore.QObject):
             self.v[(instruction & 0x0F00) >> 8] += instruction & 0x00FF
             while self.v[(instruction & 0x0F00) >> 8] > 255:
                 self.v[(instruction & 0x0F00) >> 8] -= 255
+        elif instruction & 0xF00F == 0x8000:
+            # Sets the first register to the value of the second
+            if self.debug:
+                print(f"[{instruction:04X}] Setting register {(instruction & 0x0F00) >> 8:X} to the value of"
+                      f" register {(instruction & 0x00F0) >> 4:X} ({self.v[(instruction & 0x00F0) >> 4]})")
+            self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x00F0) >> 4]
         elif instruction & 0xF00F == 0x8001:
             # ORs the value of two registers, placing the result in the first
             if self.debug:
