@@ -135,11 +135,47 @@ class Emulator(QtCore.QObject):
                 print(f"[{instruction:04X}] XORing registers {(instruction & 0x0F00) >> 8:X} and"
                       f" {(instruction & 0x00F0) >> 4:X}")
             self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x0F00) >> 8] ^ self.v[(instruction & 0x00F0) >> 4]
+        elif instruction & 0xF00F == 0x8004:
+            # Adds the value of the second register to the first
+            if self.debug:
+                print(f"[{instruction:04X}] Adding registers {(instruction & 0x0F00) >> 8:X} and"
+                      f" {(instruction & 0x00F0) >> 4:X}")
+            self.v[(instruction & 0x0F00) >> 8] += self.v[(instruction & 0x00F0) >> 4]
+            carry = False
+            while self.v[(instruction & 0x0F00) >> 8] > 255:
+                self.v[(instruction & 0x0F00) >> 8] -= 255
+                carry = True
+
+            self.v[0xF] = 1 if carry else 0
+        elif instruction & 0xF00F == 0x8005:
+            # Subtracts the value of the second register from the first
+            if self.debug:
+                print(f"[{instruction:04X}] Subtracting registers {(instruction & 0x0F00) >> 8:X} and"
+                      f" {(instruction & 0x00F0) >> 4:X}")
+            self.v[(instruction & 0x0F00) >> 8] -= self.v[(instruction & 0x00F0) >> 4]
+            borrow = False
+            while self.v[(instruction & 0x0F00) >> 8] < 0:
+                self.v[(instruction & 0x0F00) >> 8] += 255
+                borrow = True
+
+            self.v[0xF] = 0 if borrow else 1
         elif instruction & 0xF00F == 0x8006:
             # Shifts the value of the register to the right
             if self.debug:
                 print(f"[{instruction:04X}] Shifting register {(instruction & 0x0F00) >> 8:X} to the right")
             self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x0F00) >> 8] >> 1
+        elif instruction & 0xF00F == 0x8007:
+            # Sets the first register to the difference between second register and the first
+            if self.debug:
+                print(f"[{instruction:04X}] Subtracting registers {(instruction & 0x00F0) >> 4:X} and"
+                      f" {(instruction & 0x0F00) >> 8:X}, placing the result in {(instruction & 0x0F00) >> 8:X}")
+            self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x00F0) >> 4] - self.v[(instruction & 0x0F00) >> 8]
+            borrow = False
+            while self.v[(instruction & 0x0F00) >> 8] < 0:
+                self.v[(instruction & 0x0F00) >> 8] += 255
+                borrow = True
+
+            self.v[0xF] = 0 if borrow else 1
         elif instruction & 0xF00F == 0x800E:
             # Shifts the value of the register to the left
             if self.debug:
