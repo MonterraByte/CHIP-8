@@ -67,7 +67,12 @@ class Emulator(QtCore.QObject):
         instruction = int.from_bytes(self.memory[self.program_counter:self.program_counter+2], byteorder="big")
         self.program_counter += 2
 
-        if instruction == 0x00EE:
+        if instruction == 0x00E0:
+            # Clear the screen
+            if self.debug:
+                print(f"[{instruction:04X}] Clearing the screen")
+            self.video_memory.reset()
+        elif instruction == 0x00EE:
             # Return from subroutine.
             self.stack_pointer -= 2
             self.program_counter = int.from_bytes(self.memory[self.stack_pointer:self.stack_pointer+2], byteorder="big")
