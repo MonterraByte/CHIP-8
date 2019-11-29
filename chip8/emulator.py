@@ -117,6 +117,34 @@ class Emulator(QtCore.QObject):
             self.v[(instruction & 0x0F00) >> 8] += instruction & 0x00FF
             while self.v[(instruction & 0x0F00) >> 8] > 255:
                 self.v[(instruction & 0x0F00) >> 8] -= 255
+        elif instruction & 0xF00F == 0x8001:
+            # ORs the value of two registers, placing the result in the first
+            if self.debug:
+                print(f"[{instruction:04X}] ORing registers {(instruction & 0x0F00) >> 8:X} and"
+                      f" {(instruction & 0x00F0) >> 4:X}")
+            self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x0F00) >> 8] | self.v[(instruction & 0x00F0) >> 4]
+        elif instruction & 0xF00F == 0x8002:
+            # ANDs the value of two registers, placing the result in the first
+            if self.debug:
+                print(f"[{instruction:04X}] ANDing registers {(instruction & 0x0F00) >> 8:X} and"
+                      f" {(instruction & 0x00F0) >> 4:X}")
+            self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x0F00) >> 8] & self.v[(instruction & 0x00F0) >> 4]
+        elif instruction & 0xF00F == 0x8003:
+            # XORs the value of two registers, placing the result in the first
+            if self.debug:
+                print(f"[{instruction:04X}] XORing registers {(instruction & 0x0F00) >> 8:X} and"
+                      f" {(instruction & 0x00F0) >> 4:X}")
+            self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x0F00) >> 8] ^ self.v[(instruction & 0x00F0) >> 4]
+        elif instruction & 0xF00F == 0x8006:
+            # Shifts the value of the register to the right
+            if self.debug:
+                print(f"[{instruction:04X}] Shifting register {(instruction & 0x0F00) >> 8:X} to the right")
+            self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x0F00) >> 8] >> 1
+        elif instruction & 0xF00F == 0x800E:
+            # Shifts the value of the register to the left
+            if self.debug:
+                print(f"[{instruction:04X}] Shifting register {(instruction & 0x0F00) >> 8:X} to the left")
+            self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x0F00) >> 8] << 1
         elif instruction & 0xF00F == 0x9000:
             # Skip the next instruction if the registers have different values.
             if self.debug:
