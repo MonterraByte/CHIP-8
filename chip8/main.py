@@ -52,6 +52,7 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.close_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence(QtGui.QKeySequence.Quit), self)
         self.close_shortcut.activated.connect(self.close)
+        self.actionPause.setShortcut(QtGui.QKeySequence.Print)  # Ctrl + P
         self.actionExit.triggered.connect(self.close)
         self.actionOpen.triggered.connect(self.open_rom)
 
