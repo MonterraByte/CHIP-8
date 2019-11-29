@@ -261,6 +261,18 @@ class Emulator(QtCore.QObject):
             if self.debug:
                 print(f"[{instruction:04X}] Loading the sound timer with value {(instruction & 0x0F00) >> 8}")
             self.sound_timer = (instruction & 0x0F00) >> 8
+        elif instruction & 0xF0FF == 0xF01E:
+            # Adds the value in the register to the index register
+            if self.debug:
+                print(f"[{instruction:04X}] Adding the value from register "
+                      f"{(instruction & 0x0F00) >> 8:X} ({self.v[(instruction & 0x0F00) >> 8]:02X}"
+                      f") to the index register")
+            self.index_register += self.v[(instruction & 0x0F00) >> 8]
+            if self.index_register > 0xFFF:
+                self.index_register -= 0x1000
+                self.v[0xF] = 1
+            else:
+                self.v[0xF] = 0
         elif instruction & 0xF0FF == 0xF029:
             # Load index register with the location of the font for the value in the register
             if self.debug:
