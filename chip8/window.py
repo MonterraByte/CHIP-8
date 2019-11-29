@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'chip8/window.ui',
 # licensing of 'chip8/window.ui' applies.
 #
-# Created: Wed Nov 27 14:35:31 2019
+# Created: Fri Nov 29 22:37:32 2019
 #      by: pyside2-uic  running on PySide2 5.13.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -20,7 +20,7 @@ class Ui_MainWindow(object):
         self.graphicsView.setAcceptDrops(False)
         self.graphicsView.setObjectName("graphicsView")
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 30))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 32))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -37,9 +37,12 @@ class Ui_MainWindow(object):
         self.actionPause = QtWidgets.QAction(MainWindow)
         self.actionPause.setCheckable(True)
         self.actionPause.setObjectName("actionPause")
+        self.actionRestart = QtWidgets.QAction(MainWindow)
+        self.actionRestart.setObjectName("actionRestart")
         self.menuFile.addAction(self.actionOpen)
         self.menuFile.addAction(self.actionExit)
         self.menuEmulation.addAction(self.actionPause)
+        self.menuEmulation.addAction(self.actionRestart)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuEmulation.menuAction())
 
@@ -53,4 +56,5 @@ class Ui_MainWindow(object):
         self.actionOpen.setText(QtWidgets.QApplication.translate("MainWindow", "Open...", None, -1))
         self.actionExit.setText(QtWidgets.QApplication.translate("MainWindow", "Exit", None, -1))
         self.actionPause.setText(QtWidgets.QApplication.translate("MainWindow", "Pause", None, -1))
+        self.actionRestart.setText(QtWidgets.QApplication.translate("MainWindow", "Restart", None, -1))
 

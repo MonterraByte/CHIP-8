@@ -53,6 +53,9 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.close_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence(QtGui.QKeySequence.Quit), self)
         self.close_shortcut.activated.connect(self.close)
         self.actionPause.setShortcut(QtGui.QKeySequence.Print)  # Ctrl + P
+        self.actionRestart.setShortcut(QtGui.QKeySequence.Replace)  # Ctrl + R
+        self.actionRestart.setEnabled(False)
+        self.actionRestart.triggered.connect(self.new_emulator)
         self.actionExit.triggered.connect(self.close)
         self.actionOpen.triggered.connect(self.open_rom)
 
@@ -64,9 +67,11 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(FRAME_INTERVAL)
 
+        self.rom = None
         self.emulator = None
         if args.rom:
-            self.new_emulator(args.rom)
+            self.load_rom(args.rom)
+            self.new_emulator()
             self.timer.start()
 
         self.actionPause.toggled.connect(self.toggle_emulation)
@@ -86,7 +91,6 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
     def is_key_pressed(self, key: int) -> bool:
         return self.keys[key]
 
-
     @QtCore.Slot()
     def toggle_emulation(self, checked):
         if checked:
@@ -98,21 +102,30 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
     def open_rom(self):
         rom_path, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Select ROM")
         if rom_path:
-            self.new_emulator(pathlib.Path(rom_path))
+            self.load_rom(pathlib.Path(rom_path))
+            self.new_emulator()
 
-    def new_emulator(self, rom_path: pathlib.Path):
+    def load_rom(self, rom_path: pathlib.Path):
+        with rom_path.open("rb") as fd:
+            self.rom = fd.read()
+
+    def new_emulator(self):
+        assert self.rom is not None
+
         if self.emulator is not None:
             self.emulator.display_changed.disconnect()
             self.emulator.emulation_error.disconnect()
             self.timer.timeout.disconnect(self.emulator.run_once)
 
-        with rom_path.open("rb") as fd:
-            self.emulator = Emulator(fd.read(), self, self.debug)
+        self.emulator = Emulator(self.rom, self, self.debug)
+
         self.emulator.display_changed.connect(self.draw)
         self.emulator.emulation_error.connect(self.report_error)
         self.timer.timeout.connect(self.emulator.run_once)
         self.actionPause.setChecked(False)
         self.toggle_emulation(False)
+
+        self.actionRestart.setEnabled(True)
 
     def eventFilter(self, watched: QtCore.QObject, event: QtCore.QEvent) -> bool:
         if event.type() == QtCore.QEvent.KeyPress or event.type() == QtCore.QEvent.KeyRelease:
