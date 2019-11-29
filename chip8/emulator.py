@@ -116,7 +116,7 @@ class Emulator(QtCore.QObject):
                 print(f"[{instruction:04X}] Adding {instruction & 0x00FF:02X} to register {(instruction & 0x0F00) >> 8:X} (carry discarded)")
             self.v[(instruction & 0x0F00) >> 8] += instruction & 0x00FF
             while self.v[(instruction & 0x0F00) >> 8] > 255:
-                self.v[(instruction & 0x0F00) >> 8] -= 255
+                self.v[(instruction & 0x0F00) >> 8] -= 256
         elif instruction & 0xF00F == 0x8000:
             # Sets the first register to the value of the second
             if self.debug:
@@ -149,7 +149,7 @@ class Emulator(QtCore.QObject):
             self.v[(instruction & 0x0F00) >> 8] += self.v[(instruction & 0x00F0) >> 4]
             carry = False
             while self.v[(instruction & 0x0F00) >> 8] > 255:
-                self.v[(instruction & 0x0F00) >> 8] -= 255
+                self.v[(instruction & 0x0F00) >> 8] -= 256
                 carry = True
 
             self.v[0xF] = 1 if carry else 0
@@ -161,7 +161,7 @@ class Emulator(QtCore.QObject):
             self.v[(instruction & 0x0F00) >> 8] -= self.v[(instruction & 0x00F0) >> 4]
             borrow = False
             while self.v[(instruction & 0x0F00) >> 8] < 0:
-                self.v[(instruction & 0x0F00) >> 8] += 255
+                self.v[(instruction & 0x0F00) >> 8] += 256
                 borrow = True
 
             self.v[0xF] = 0 if borrow else 1
@@ -178,7 +178,7 @@ class Emulator(QtCore.QObject):
             self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x00F0) >> 4] - self.v[(instruction & 0x0F00) >> 8]
             borrow = False
             while self.v[(instruction & 0x0F00) >> 8] < 0:
-                self.v[(instruction & 0x0F00) >> 8] += 255
+                self.v[(instruction & 0x0F00) >> 8] += 256
                 borrow = True
 
             self.v[0xF] = 0 if borrow else 1
