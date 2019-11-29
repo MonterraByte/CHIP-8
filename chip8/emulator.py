@@ -52,6 +52,9 @@ class Emulator(QtCore.QObject):
         self.delay_timer = 0
         self.sound_timer = 0
 
+        self.waiting_for_keypress = False
+        self.keypress_target = None
+
         self.memory = Memory()
         self.video_memory = VideoMemory()
 
@@ -64,6 +67,16 @@ class Emulator(QtCore.QObject):
 
     @QtCore.Slot()
     def run_once(self):
+        if self.waiting_for_keypress:
+            # Implementation of instruction 0xFX0A
+            for key in range(16):
+                if self.parent.is_key_pressed(key):
+                    self.v[self.keypress_target] = key
+                    self.waiting_for_keypress = False
+                    break
+            else:
+                return
+
         instruction = int.from_bytes(self.memory[self.program_counter:self.program_counter+2], byteorder="big")
         self.program_counter += 2
 
@@ -251,6 +264,13 @@ class Emulator(QtCore.QObject):
             if self.debug:
                 print(f"[{instruction:04X}] Loading register {(instruction & 0x0F00) >> 8:X} with the value of the delay timer ({self.delay_timer})")
             self.v[(instruction & 0x0F00) >> 8] = self.delay_timer
+        elif instruction & 0xF0FF == 0xF00A:
+            # Wait for key press and store it in the register
+            if self.debug:
+                print(f"[{instruction:04X}] Waiting for keypress to store in register"
+                      f" {(instruction & 0x0F00) >> 8:X}")
+            self.keypress_target = (instruction & 0x0F00) >> 8
+            self.waiting_for_keypress = True
         elif instruction & 0xF0FF == 0xF015:
             # Load delay register
             if self.debug:
