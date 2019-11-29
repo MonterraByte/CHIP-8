@@ -58,6 +58,9 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.debug = args.debug
 
+        self.keys = {i: False for i in range(16)}
+        self.installEventFilter(self)
+
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(FRAME_INTERVAL)
 
@@ -80,6 +83,10 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
                                                                               DISPLAY_HEIGHT * self.scale_factor))
         self.graphicsPixmapItem.setPixmap(self.pixmap)
 
+    def is_key_pressed(self, key: int) -> bool:
+        return self.keys[key]
+
+
     @QtCore.Slot()
     def toggle_emulation(self, checked):
         if checked:
@@ -98,12 +105,53 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
             self.emulator.display_changed.disconnect(self.draw)
 
         with rom_path.open("rb") as fd:
-            self.emulator = Emulator(fd.read(), self.debug)
+            self.emulator = Emulator(fd.read(), self, self.debug)
         self.emulator.display_changed.connect(self.draw)
         self.emulator.emulation_error.connect(self.report_error)
         self.timer.timeout.connect(self.emulator.run_once)
         self.actionPause.setChecked(False)
         self.toggle_emulation(False)
+
+    def eventFilter(self, watched: QtCore.QObject, event: QtCore.QEvent) -> bool:
+        if event.type() == QtCore.QEvent.KeyPress or event.type() == QtCore.QEvent.KeyRelease:
+            if event.key() == QtCore.Qt.Key_X:
+                key = 0
+            elif event.key() == QtCore.Qt.Key_1:
+                key = 1
+            elif event.key() == QtCore.Qt.Key_2:
+                key = 2
+            elif event.key() == QtCore.Qt.Key_3:
+                key = 3
+            elif event.key() == QtCore.Qt.Key_Q:
+                key = 4
+            elif event.key() == QtCore.Qt.Key_W:
+                key = 5
+            elif event.key() == QtCore.Qt.Key_E:
+                key = 6
+            elif event.key() == QtCore.Qt.Key_A:
+                key = 7
+            elif event.key() == QtCore.Qt.Key_S:
+                key = 8
+            elif event.key() == QtCore.Qt.Key_D:
+                key = 9
+            elif event.key() == QtCore.Qt.Key_Z:
+                key = 10
+            elif event.key() == QtCore.Qt.Key_C:
+                key = 11
+            elif event.key() == QtCore.Qt.Key_4:
+                key = 12
+            elif event.key() == QtCore.Qt.Key_R:
+                key = 13
+            elif event.key() == QtCore.Qt.Key_F:
+                key = 14
+            elif event.key() == QtCore.Qt.Key_V:
+                key = 15
+            else:
+                return QtWidgets.QMainWindow.eventFilter(self, watched, event)
+
+            self.keys[key] = event.type() == QtCore.QEvent.KeyPress
+        else:
+            return QtWidgets.QMainWindow.eventFilter(self, watched, event)
 
     @QtCore.Slot(Exception)
     def report_error(self, error: Exception):

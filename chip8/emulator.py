@@ -40,8 +40,9 @@ class Emulator(QtCore.QObject):
     display_changed = QtCore.Signal()
     emulation_error = QtCore.Signal(Exception)
 
-    def __init__(self, rom, debug=False):
-        super().__init__()
+    def __init__(self, rom, parent, debug=False):
+        super().__init__(parent=parent)
+        self.parent = parent
         self.debug = debug
 
         self.v = [0] * 16
@@ -156,6 +157,20 @@ class Emulator(QtCore.QObject):
                 self.v[0xF] = 0
 
             self.display_changed.emit()
+        elif instruction & 0xF0FF == 0xE09E:
+            # Skip the next instruction if the key specified in the source register is pressed.
+            if self.debug:
+                print(f"[{instruction:04X}] Conditional skip if key from register {(instruction & 0x0F00) >> 8:X} "
+                      f"({self.v[(instruction & 0x0F00) >> 8]}) is pressed")
+            if self.parent.is_key_pressed(self.v[(instruction & 0x0F00) >> 8]):
+                self.program_counter += 2
+        elif instruction & 0xF0FF == 0xE0A1:
+            # Skip the next instruction if the key specified in the source register is not pressed.
+            if self.debug:
+                print(f"[{instruction:04X}] Conditional skip if key from register {(instruction & 0x0F00) >> 8:X} "
+                      f"({self.v[(instruction & 0x0F00) >> 8]}) is not pressed")
+            if not self.parent.is_key_pressed(self.v[(instruction & 0x0F00) >> 8]):
+                self.program_counter += 2
         elif instruction & 0xF0FF == 0xF007:
             # Load delay register
             if self.debug:
