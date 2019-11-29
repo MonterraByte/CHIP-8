@@ -102,7 +102,9 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def new_emulator(self, rom_path: pathlib.Path):
         if self.emulator is not None:
-            self.emulator.display_changed.disconnect(self.draw)
+            self.emulator.display_changed.disconnect()
+            self.emulator.emulation_error.disconnect()
+            self.timer.timeout.disconnect(self.emulator.run_once)
 
         with rom_path.open("rb") as fd:
             self.emulator = Emulator(fd.read(), self, self.debug)
