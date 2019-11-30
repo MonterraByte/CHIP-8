@@ -26,7 +26,7 @@ from .emulator import Emulator
 from .error import Ui_ErrorWindow
 from .window import Ui_MainWindow
 
-FRAME_INTERVAL = 166
+FRAME_INTERVAL = 2
 
 parser = argparse.ArgumentParser(description="CHIP-8 emulator")
 parser.add_argument("rom", help="Path to the ROM file", type=pathlib.Path, nargs="?")
