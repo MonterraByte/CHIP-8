@@ -77,6 +77,13 @@ class Emulator(QtCore.QObject):
             else:
                 return
 
+        # This isn't very accurate
+        if self.delay_timer > 0:
+            self.delay_timer -= 1
+
+        if self.sound_timer > 0:
+            self.sound_timer -= 1
+
         instruction = int.from_bytes(self.memory[self.program_counter:self.program_counter+2], byteorder="big")
         self.program_counter += 2
 
