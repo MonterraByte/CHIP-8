@@ -216,6 +216,13 @@ class Emulator(QtCore.QObject):
             if self.debug:
                 print(f"[{instruction:04X}] Moving {instruction & 0x0FFF:03X} to the index register")
             self.index_register = instruction & 0x0FFF
+        elif instruction & 0xF000 == 0xB000:
+            # Jump to address plus the offset in register 0.
+            if self.debug:
+                print(f"[{instruction:04X}] Jumping to address "
+                      f"{(instruction & 0x0FFF) + self.v[0]:03X} ({instruction & 0x0FFF:03X} + "
+                      f"{self.v[0]:02X} from register 0)")
+            self.program_counter = (instruction & 0x0FFF) + self.v[0]
         elif instruction & 0xF000 == 0xC000:
             # Move value to the index register.
             rand = randint(0, 255)
