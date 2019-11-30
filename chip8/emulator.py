@@ -241,10 +241,8 @@ class Emulator(QtCore.QObject):
             if self.debug:
                 print(f"[{instruction:04X}] Drawing sprite from memory address {self.index_register:03X} ({instruction & 0x000F} tall) at coordinates {x}, {y}")
 
-            collision = False
-            for i in range(instruction & 0x000F):
-                sprite = self.memory[self.index_register + i]
-                collision = collision or self.video_memory.draw_sprite_line(x, y + i, sprite)
+            sprite = self.memory[self.index_register:self.index_register + (instruction & 0x000F)]
+            collision = self.video_memory.draw_sprite(x, y, sprite)
 
             if collision:
                 if self.debug:
