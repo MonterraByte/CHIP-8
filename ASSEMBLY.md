@@ -5,13 +5,13 @@
 | Name | Arguments | Opcode | Description        |
 |:----:|:---------:|:------:| ------------------ |
 | cls  |           | 00E0   | Clears the screen. |
-| jmp  | NNN       | 1NNN   | Jumps to address NNN. |
+| jmp  | NNN (or LABEL) | 1NNN   | Jumps to address NNN. |
 | jmpo | NNN       | ANNN   | Jumps to the sum of NNN and the value in V0. |
-| call | NNN       | 2NNN   | Call subroutine at address NNN. |
+| call | NNN (or LABEL) | 2NNN   | Call subroutine at address NNN. |
 | ret  |           | 00EE   | Returns from subroutine. |
 | seq  | Vx, NN or Vx, Vy | 3xNN or 5xy0 | Skips the next instruction if the arguments have the same value. |
 | sneq | Vx, NN or Vx, Vy | 4xNN or 9xy0 | Skips the next instruction if the arguments have different values. |
-| mov  | Vx, NN or Vx, Vy or I, NNN or Vx, D or D, Vx or S, Vx | 6xNN or 8xy0 or ANNN or Fx07 or Fx15 or Fx18 | Assigns the first argument the value of the second argument. |
+| mov  | Vx, NN or Vx, Vy or I, NNN (or LABEL) or Vx, D or D, Vx or S, Vx | 6xNN or 8xy0 or ANNN or Fx07 or Fx15 or Fx18 | Assigns the first argument the value of the second argument. |
 | add  | Vx, NN or Vx, Vy or I, Vx | 7xNN or 8xy4 or Fx1E | Adds the value of the second argument to Vx. (If the second argument is a constant, Vf isn't modified) |
 | sub  | Vx, Vy    | 8xy5   | Subtracts the value of the first argument from Vx. (Vf is set to 1 when there isn't a borrow, 0 otherwise) |
 | or   | Vx, Vy    | 8xy1   | ORs Vx with the value of Vy. |
@@ -39,3 +39,12 @@
 | I         | Index register, its value is used as a memory address by some instructions |
 | D         | Delay register                                                             |
 | S         | Sound register                                                             |
+
+## Labels
+
+A label can be used instead of a hardcoded address in the following instructions: `jmp`, `call` and `mov`.
+
+To define a label, write its name before the corresponding instruction, followed by a `:`.
+For example:
+
+    LABEL_NAME: instruction arg1, arg2
