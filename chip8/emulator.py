@@ -288,13 +288,17 @@ class Emulator(QtCore.QObject):
         elif instruction & 0xF0FF == 0xF015:
             # Load delay register
             if self.debug:
-                print(f"[{instruction:04X}] Loading the delay timer with value {(instruction & 0x0F00) >> 8}")
-            self.delay_timer = (instruction & 0x0F00) >> 8
+                print(f"[{instruction:04X}] Loading the delay timer with value from register "
+                      f"V{(instruction & 0x0F00) >> 8:X} "
+                      f"(0x{self.v[(instruction & 0x0F00) >> 8]:X})")
+            self.delay_timer = self.v[(instruction & 0x0F00) >> 8]
         elif instruction & 0xF0FF == 0xF018:
             # Load delay register
             if self.debug:
-                print(f"[{instruction:04X}] Loading the sound timer with value {(instruction & 0x0F00) >> 8}")
-            self.sound_timer = (instruction & 0x0F00) >> 8
+                print(f"[{instruction:04X}] Loading the sound timer with value from register "
+                      f"V{(instruction & 0x0F00) >> 8:X} "
+                      f"(0x{self.v[(instruction & 0x0F00) >> 8]:X})")
+            self.sound_timer = self.v[(instruction & 0x0F00) >> 8]
         elif instruction & 0xF0FF == 0xF01E:
             # Adds the value in the register to the index register
             if self.debug:
