@@ -97,16 +97,18 @@ class Emulator(QtCore.QObject):
             self.stack_pointer -= 2
             self.program_counter = int.from_bytes(self.memory[self.stack_pointer:self.stack_pointer+2], byteorder="big")
             if self.debug:
-                print(f"[{instruction:04X}] Returning from subroutine to address {self.program_counter:04X}")
+                print(f"[{instruction:04X}] Returning from subroutine to address "
+                      f"0x{self.program_counter:04X}")
         elif instruction & 0xF000 == 0x1000:
             # Jump to address.
             if self.debug:
-                print(f"[{instruction:04X}] Jumping to address {instruction & 0x0FFF:03X}")
+                print(f"[{instruction:04X}] Jumping to address 0x{instruction & 0x0FFF:03X}")
             self.program_counter = instruction & 0x0FFF
         elif instruction & 0xF000 == 0x2000:
             # Call subroutine.
             if self.debug:
-                print(f"[{instruction:04X}] Calling subroutine at address {instruction & 0x0FFF:03X}")
+                print(f"[{instruction:04X}] Calling subroutine at address "
+                      f"0x{instruction & 0x0FFF:03X}")
             return_address = int.to_bytes(self.program_counter, 2, byteorder="big")
             self.memory[self.stack_pointer:self.stack_pointer+2] = return_address
 
@@ -115,62 +117,72 @@ class Emulator(QtCore.QObject):
         elif instruction & 0xF000 == 0x3000:
             # Skip the next instruction if the source register equals value.
             if self.debug:
-                print(f"[{instruction:04X}] Conditional skip if register {(instruction & 0x0F00) >> 8:X} equals {instruction & 0x00FF:02X} ({self.v[(instruction & 0x0F00) >> 8] == instruction & 0x00FF})")
+                print(f"[{instruction:04X}] Conditional skip if register "
+                      f"V{(instruction & 0x0F00) >> 8:X} equals 0x{instruction & 0x00FF:02X} "
+                      f"({self.v[(instruction & 0x0F00) >> 8] == instruction & 0x00FF})")
             if self.v[(instruction & 0x0F00) >> 8] == instruction & 0x00FF:
                 self.program_counter += 2
         elif instruction & 0xF000 == 0x4000:
             # Skip the next instruction if the source register does not equal value.
             if self.debug:
-                print(f"[{instruction:04X}] Conditional skip if register {(instruction & 0x0F00) >> 8:X} does not equal {instruction & 0x00FF:02X} ({self.v[(instruction & 0x0F00) >> 8] != instruction & 0x00FF})")
+                print(f"[{instruction:04X}] Conditional skip if register "
+                      f"V{(instruction & 0x0F00) >> 8:X} does not equal "
+                      f"0x{instruction & 0x00FF:02X} "
+                      f"({self.v[(instruction & 0x0F00) >> 8] != instruction & 0x00FF})")
             if self.v[(instruction & 0x0F00) >> 8] != instruction & 0x00FF:
                 self.program_counter += 2
         elif instruction & 0xF00F == 0x5000:
             # Skip the next instruction if the registers have the same value.
             if self.debug:
-                print(f"[{instruction:04X}] Conditional skip if the values of the registers {(instruction & 0x0F00) >> 8:X} and {(instruction & 0x00F0) >> 4:X} are equal ({self.v[(instruction & 0x0F00) >> 8] == self.v[(instruction & 0x00F0) >> 4]})")
+                print(f"[{instruction:04X}] Conditional skip if the values of the registers "
+                      f"V{(instruction & 0x0F00) >> 8:X} and V{(instruction & 0x00F0) >> 4:X} "
+                      f"are equal ({self.v[(instruction & 0x0F00) >> 8] == self.v[(instruction & 0x00F0) >> 4]})")
             if self.v[(instruction & 0x0F00) >> 8] == self.v[(instruction & 0x00F0) >> 4]:
                 self.program_counter += 2
         elif instruction & 0xF000 == 0x6000:
             # Move value to register
             if self.debug:
-                print(f"[{instruction:04X}] Moving {instruction & 0x00FF:02X} to register {(instruction & 0x0F00) >> 8:X}")
+                print(f"[{instruction:04X}] Moving {instruction & 0x00FF:02X} to register "
+                      f"V{(instruction & 0x0F00) >> 8:X}")
             self.v[(instruction & 0x0F00) >> 8] = instruction & 0x00FF
         elif instruction & 0xF000 == 0x7000:
             # Add value to register (wrapping addition, no carry)
             if self.debug:
-                print(f"[{instruction:04X}] Adding {instruction & 0x00FF:02X} to register {(instruction & 0x0F00) >> 8:X} (carry discarded)")
+                print(f"[{instruction:04X}] Adding {instruction & 0x00FF:02X} to register "
+                      f"V{(instruction & 0x0F00) >> 8:X} (carry discarded)")
             self.v[(instruction & 0x0F00) >> 8] += instruction & 0x00FF
             while self.v[(instruction & 0x0F00) >> 8] > 255:
                 self.v[(instruction & 0x0F00) >> 8] -= 256
         elif instruction & 0xF00F == 0x8000:
             # Sets the first register to the value of the second
             if self.debug:
-                print(f"[{instruction:04X}] Setting register {(instruction & 0x0F00) >> 8:X} to the value of"
-                      f" register {(instruction & 0x00F0) >> 4:X} ({self.v[(instruction & 0x00F0) >> 4]})")
+                print(f"[{instruction:04X}] Setting register V{(instruction & 0x0F00) >> 8:X} to "
+                      f"the value of register V{(instruction & 0x00F0) >> 4:X} "
+                      f"(0x{self.v[(instruction & 0x00F0) >> 4]:02X})")
             self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x00F0) >> 4]
         elif instruction & 0xF00F == 0x8001:
             # ORs the value of two registers, placing the result in the first
             if self.debug:
-                print(f"[{instruction:04X}] ORing registers {(instruction & 0x0F00) >> 8:X} and"
-                      f" {(instruction & 0x00F0) >> 4:X}")
+                print(f"[{instruction:04X}] ORing registers V{(instruction & 0x0F00) >> 8:X} and"
+                      f" V{(instruction & 0x00F0) >> 4:X}")
             self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x0F00) >> 8] | self.v[(instruction & 0x00F0) >> 4]
         elif instruction & 0xF00F == 0x8002:
             # ANDs the value of two registers, placing the result in the first
             if self.debug:
-                print(f"[{instruction:04X}] ANDing registers {(instruction & 0x0F00) >> 8:X} and"
-                      f" {(instruction & 0x00F0) >> 4:X}")
+                print(f"[{instruction:04X}] ANDing registers V{(instruction & 0x0F00) >> 8:X} and"
+                      f" V{(instruction & 0x00F0) >> 4:X}")
             self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x0F00) >> 8] & self.v[(instruction & 0x00F0) >> 4]
         elif instruction & 0xF00F == 0x8003:
             # XORs the value of two registers, placing the result in the first
             if self.debug:
-                print(f"[{instruction:04X}] XORing registers {(instruction & 0x0F00) >> 8:X} and"
-                      f" {(instruction & 0x00F0) >> 4:X}")
+                print(f"[{instruction:04X}] XORing registers V{(instruction & 0x0F00) >> 8:X} and"
+                      f" V{(instruction & 0x00F0) >> 4:X}")
             self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x0F00) >> 8] ^ self.v[(instruction & 0x00F0) >> 4]
         elif instruction & 0xF00F == 0x8004:
             # Adds the value of the second register to the first
             if self.debug:
-                print(f"[{instruction:04X}] Adding registers {(instruction & 0x0F00) >> 8:X} and"
-                      f" {(instruction & 0x00F0) >> 4:X}")
+                print(f"[{instruction:04X}] Adding registers V{(instruction & 0x0F00) >> 8:X} and"
+                      f" V{(instruction & 0x00F0) >> 4:X}")
             self.v[(instruction & 0x0F00) >> 8] += self.v[(instruction & 0x00F0) >> 4]
             carry = False
             while self.v[(instruction & 0x0F00) >> 8] > 255:
@@ -181,8 +193,8 @@ class Emulator(QtCore.QObject):
         elif instruction & 0xF00F == 0x8005:
             # Subtracts the value of the second register from the first
             if self.debug:
-                print(f"[{instruction:04X}] Subtracting registers {(instruction & 0x0F00) >> 8:X} and"
-                      f" {(instruction & 0x00F0) >> 4:X}")
+                print(f"[{instruction:04X}] Subtracting registers "
+                      f"V{(instruction & 0x0F00) >> 8:X} and V{(instruction & 0x00F0) >> 4:X}")
             self.v[(instruction & 0x0F00) >> 8] -= self.v[(instruction & 0x00F0) >> 4]
             borrow = False
             while self.v[(instruction & 0x0F00) >> 8] < 0:
@@ -193,14 +205,16 @@ class Emulator(QtCore.QObject):
         elif instruction & 0xF00F == 0x8006:
             # Shifts the value of the register to the right
             if self.debug:
-                print(f"[{instruction:04X}] Shifting register {(instruction & 0x0F00) >> 8:X} to the right")
+                print(f"[{instruction:04X}] Shifting register V{(instruction & 0x0F00) >> 8:X} "
+                      f"to the right")
             self.v[0xF] = self.v[(instruction & 0x0F00) >> 8] & 0b00000001
             self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x0F00) >> 8] >> 1
         elif instruction & 0xF00F == 0x8007:
             # Sets the first register to the difference between second register and the first
             if self.debug:
-                print(f"[{instruction:04X}] Subtracting registers {(instruction & 0x00F0) >> 4:X} and"
-                      f" {(instruction & 0x0F00) >> 8:X}, placing the result in {(instruction & 0x0F00) >> 8:X}")
+                print(f"[{instruction:04X}] Subtracting registers "
+                      f"V{(instruction & 0x00F0) >> 4:X} and V{(instruction & 0x0F00) >> 8:X}, "
+                      f"placing the result in V{(instruction & 0x0F00) >> 8:X}")
             self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x00F0) >> 4] - self.v[(instruction & 0x0F00) >> 8]
             borrow = False
             while self.v[(instruction & 0x0F00) >> 8] < 0:
@@ -211,34 +225,38 @@ class Emulator(QtCore.QObject):
         elif instruction & 0xF00F == 0x800E:
             # Shifts the value of the register to the left
             if self.debug:
-                print(f"[{instruction:04X}] Shifting register {(instruction & 0x0F00) >> 8:X} to the left")
+                print(f"[{instruction:04X}] Shifting register V{(instruction & 0x0F00) >> 8:X} "
+                      f"to the left")
             self.v[0xF] = (self.v[(instruction & 0x0F00) >> 8] & 0b10000000) >> 7
             self.v[(instruction & 0x0F00) >> 8] = self.v[(instruction & 0x0F00) >> 8] << 1
         elif instruction & 0xF00F == 0x9000:
             # Skip the next instruction if the registers have different values.
             if self.debug:
-                print(f"[{instruction:04X}] Conditional skip if the values of the registers {(instruction & 0x0F00) >> 8:X} and {(instruction & 0x00F0) >> 4:X} differ ({self.v[(instruction & 0x0F00) >> 8] == self.v[(instruction & 0x00F0) >> 4]})")
+                print(f"[{instruction:04X}] Conditional skip if the values of the registers "
+                      f"V{(instruction & 0x0F00) >> 8:X} and V{(instruction & 0x00F0) >> 4:X} "
+                      f"differ ({self.v[(instruction & 0x0F00) >> 8] == self.v[(instruction & 0x00F0) >> 4]})")
             if self.v[(instruction & 0x0F00) >> 8] != self.v[(instruction & 0x00F0) >> 4]:
                 self.program_counter += 2
         elif instruction & 0xF000 == 0xA000:
             # Move value to the index register.
             if self.debug:
-                print(f"[{instruction:04X}] Moving {instruction & 0x0FFF:03X} to the index register")
+                print(f"[{instruction:04X}] Moving 0x{instruction & 0x0FFF:03X} to the index "
+                      f"register")
             self.index_register = instruction & 0x0FFF
         elif instruction & 0xF000 == 0xB000:
             # Jump to address plus the offset in register 0.
             if self.debug:
                 print(f"[{instruction:04X}] Jumping to address "
-                      f"{(instruction & 0x0FFF) + self.v[0]:03X} ({instruction & 0x0FFF:03X} + "
-                      f"{self.v[0]:02X} from register 0)")
+                      f"0x{(instruction & 0x0FFF) + self.v[0]:03X} (0x{instruction & 0x0FFF:03X} +"
+                      f" 0x{self.v[0]:02X} from register 0)")
             self.program_counter = (instruction & 0x0FFF) + self.v[0]
         elif instruction & 0xF000 == 0xC000:
             # Move value to the index register.
             rand = randint(0, 255)
             if self.debug:
                 print(f"[{instruction:04X}] Performing AND between a random number (0x{rand:02X})"
-                      f" and the value {instruction & 0x00FF:02X}, storing the result in "
-                      f"register {(instruction & 0x0F00) >> 8:X}")
+                      f" and the value 0x{instruction & 0x00FF:02X}, storing the result in "
+                      f"register V{(instruction & 0x0F00) >> 8:X}")
             self.v[(instruction & 0x0F00) >> 8] = rand & (instruction & 0x00FF)
         elif instruction & 0xF000 == 0xD000:
             # Draw sprite.
@@ -246,7 +264,9 @@ class Emulator(QtCore.QObject):
             y = self.v[(instruction & 0x00F0) >> 4]
 
             if self.debug:
-                print(f"[{instruction:04X}] Drawing sprite from memory address {self.index_register:03X} ({instruction & 0x000F} tall) at coordinates {x}, {y}")
+                print(f"[{instruction:04X}] Drawing sprite from memory address "
+                      f"0x{self.index_register:03X} ({instruction & 0x000F} tall) at coordinates"
+                      f" {x}, {y}")
 
             sprite = self.memory[self.index_register:self.index_register + (instruction & 0x000F)]
             collision = self.video_memory.draw_sprite(x, y, sprite)
@@ -262,27 +282,30 @@ class Emulator(QtCore.QObject):
         elif instruction & 0xF0FF == 0xE09E:
             # Skip the next instruction if the key specified in the source register is pressed.
             if self.debug:
-                print(f"[{instruction:04X}] Conditional skip if key from register {(instruction & 0x0F00) >> 8:X} "
-                      f"({self.v[(instruction & 0x0F00) >> 8]}) is pressed")
+                print(f"[{instruction:04X}] Conditional skip if key from register "
+                      f"V{(instruction & 0x0F00) >> 8:X} "
+                      f"(0x{self.v[(instruction & 0x0F00) >> 8]:X}) is pressed")
             if self.parent.is_key_pressed(self.v[(instruction & 0x0F00) >> 8]):
                 self.program_counter += 2
         elif instruction & 0xF0FF == 0xE0A1:
             # Skip the next instruction if the key specified in the source register is not pressed.
             if self.debug:
-                print(f"[{instruction:04X}] Conditional skip if key from register {(instruction & 0x0F00) >> 8:X} "
-                      f"({self.v[(instruction & 0x0F00) >> 8]}) is not pressed")
+                print(f"[{instruction:04X}] Conditional skip if key from register "
+                      f"V{(instruction & 0x0F00) >> 8:X} "
+                      f"(0x{self.v[(instruction & 0x0F00) >> 8]}) is not pressed")
             if not self.parent.is_key_pressed(self.v[(instruction & 0x0F00) >> 8]):
                 self.program_counter += 2
         elif instruction & 0xF0FF == 0xF007:
             # Read delay register
             if self.debug:
-                print(f"[{instruction:04X}] Loading register {(instruction & 0x0F00) >> 8:X} with the value of the delay timer ({self.delay_timer})")
+                print(f"[{instruction:04X}] Loading register V{(instruction & 0x0F00) >> 8:X} "
+                      f"with the value of the delay timer (0x{self.delay_timer:X})")
             self.v[(instruction & 0x0F00) >> 8] = self.delay_timer
         elif instruction & 0xF0FF == 0xF00A:
             # Wait for key press and store it in the register
             if self.debug:
                 print(f"[{instruction:04X}] Waiting for keypress to store in register"
-                      f" {(instruction & 0x0F00) >> 8:X}")
+                      f" V{(instruction & 0x0F00) >> 8:X}")
             self.keypress_target = (instruction & 0x0F00) >> 8
             self.waiting_for_keypress = True
         elif instruction & 0xF0FF == 0xF015:
@@ -303,8 +326,8 @@ class Emulator(QtCore.QObject):
             # Adds the value in the register to the index register
             if self.debug:
                 print(f"[{instruction:04X}] Adding the value from register "
-                      f"{(instruction & 0x0F00) >> 8:X} ({self.v[(instruction & 0x0F00) >> 8]:02X}"
-                      f") to the index register")
+                      f"V{(instruction & 0x0F00) >> 8:X} "
+                      f"(0x{self.v[(instruction & 0x0F00) >> 8]:02X}) to the index register")
             self.index_register += self.v[(instruction & 0x0F00) >> 8]
             if self.index_register > 0xFFF:
                 self.index_register -= 0x1000
@@ -314,14 +337,19 @@ class Emulator(QtCore.QObject):
         elif instruction & 0xF0FF == 0xF029:
             # Load index register with the location of the font for the value in the register
             if self.debug:
-                print(f"[{instruction:04X}] Loading the index register with the address of the font for {self.v[(instruction & 0x0F00) >> 8]} from register {(instruction & 0x0F00) >> 8:X}")
+                print(f"[{instruction:04X}] Loading the index register with the address of the "
+                      f"font for {self.v[(instruction & 0x0F00) >> 8]:X} from register"
+                      f" V{(instruction & 0x0F00) >> 8:X}")
             self.index_register = FONT_START + self.v[(instruction & 0x0F00) >> 8] * 5
         elif instruction & 0xF0FF == 0xF033:
-            # Store the binary coded decimal representation of the value in the specified register in memory
+            # Store the binary coded decimal representation of the value
+            # in the specified register in memory
             value = self.v[(instruction & 0x0F00) >> 8]
 
             if self.debug:
-                print(f"[{instruction:04X}] Storing BCD representation of value {value} from register {(instruction & 0x0F00) >> 8:X} to address {self.index_register:03X}")
+                print(f"[{instruction:04X}] Storing BCD representation of value {value} from "
+                      f"register V{(instruction & 0x0F00) >> 8:X} in address"
+                      f" 0x{self.index_register:03X}")
 
             self.memory[self.index_register] = value // 100
             value = value % 100
@@ -330,13 +358,16 @@ class Emulator(QtCore.QObject):
         elif instruction & 0xF0FF == 0xF055:
             # Store registers in memory
             if self.debug:
-                print(f"[{instruction:04X}] Moving the first {((instruction & 0x0F00) >> 8) + 1} registers to memory address {self.index_register:03X}")
+                print(f"[{instruction:04X}] Moving the first {((instruction & 0x0F00) >> 8) + 1} "
+                      f"registers to memory address 0x{self.index_register:03X}")
             for i in range(((instruction & 0x0F00) >> 8) + 1):
                 self.memory[self.index_register + i] = self.v[i]
         elif instruction & 0xF0FF == 0xF065:
             # Read registers from memory
             if self.debug:
-                print(f"[{instruction:04X}] Moving value from memory address {self.index_register:03X} to the first {((instruction & 0x0F00) >> 8) + 1} registers")
+                print(f"[{instruction:04X}] Moving value from memory address "
+                      f"0x{self.index_register:03X} to the first"
+                      f" {((instruction & 0x0F00) >> 8) + 1} registers")
             for i in range(((instruction & 0x0F00) >> 8) + 1):
                 self.v[i] = self.memory[self.index_register + i]
         else:
