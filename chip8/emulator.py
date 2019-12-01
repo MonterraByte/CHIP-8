@@ -374,4 +374,3 @@ class Emulator(QtCore.QObject):
             exception = UnimplementedInstruction(instruction, self.program_counter-2)
             self.emulation_error.emit(exception)
             raise exception
-
