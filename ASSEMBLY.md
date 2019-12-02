@@ -28,7 +28,7 @@
 | wkey | Vx        | Fx0A   | Blocks until a key is pressed, then stores its value in Vx. |
 | str  | N         | FN55   | Stores the first N registers in the memory location pointed to by I. |
 | ldr  | N         | FN65   | Loads the first N registers from the memory location pointed to by I. |
-| raw  | DATA      |        | This isn't an instruction. The assembler simply copies the 2-byte DATA to the assembled executable. This is useful for storing data such as sprites with the program. |
+| raw  | D1, D2    |        | This isn't an instruction. The assembler simply copies the 2 bytes, D1 and D2, to the assembled executable. This is useful for storing data such as sprites with the program. |
 
 ## Register Table
 
