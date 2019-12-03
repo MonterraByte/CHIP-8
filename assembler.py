@@ -24,8 +24,27 @@ parser.add_argument("asm", help="Path to the assembly file", type=pathlib.Path)
 parser.add_argument("out", help="Path to the output file", type=pathlib.Path)
 
 
+def remove_whitespace_and_split(s: str) -> [str]:
+    result = []
+    source_map = {}
+    for num, line in enumerate(s.splitlines()):
+        comment_index = line.find("#")
+        if comment_index != -1:
+            final_line = line[:comment_index].strip().lower()
+        else:
+            final_line = line.strip().lower()
+
+        if final_line != "":
+            result.append(final_line)
+            source_map[len(result)] = num + 1
+    return result, source_map
+
+
 def assemble(assembly: str) -> bytes:
-    pass
+    instructions, source_map = remove_whitespace_and_split(assembly)
+
+    output = b""
+    return output
 
 
 def main():
