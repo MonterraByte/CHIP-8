@@ -34,9 +34,9 @@ class TokenType(enum.Enum):
     INSTRUCTION = 0
     CONSTANT = 1
     REGISTER = 2
-    INDEX_REGISTER = 3
-    DELAY_REGISTER = 4
-    SOUND_REGISTER = 5
+    INDEX = 3
+    DELAY = 4
+    SOUND = 5
     LABEL = 6
 
 
@@ -46,11 +46,11 @@ def get_type(token: str) -> typing.Union[TokenType, None]:
     if token in INSTRUCTION_LIST:
         return TokenType.INSTRUCTION
     elif token == "i":
-        return TokenType.INDEX_REGISTER
+        return TokenType.INDEX
     elif token == "d":
-        return TokenType.DELAY_REGISTER
+        return TokenType.DELAY
     elif token == "s":
-        return TokenType.SOUND_REGISTER
+        return TokenType.SOUND
     elif len(token) == 2 and token[0] == "v" and token[1] in HEX_CHARACTERS:
         return TokenType.REGISTER
     elif (token[:2] == "0x" and all(c in HEX_CHARACTERS for c in token)) or token.isdecimal():
