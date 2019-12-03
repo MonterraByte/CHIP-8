@@ -17,11 +17,46 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import argparse
+import enum
 import pathlib
+import typing
 
 parser = argparse.ArgumentParser(description="CHIP-8 assembler")
 parser.add_argument("asm", help="Path to the assembly file", type=pathlib.Path)
 parser.add_argument("out", help="Path to the output file", type=pathlib.Path)
+
+INSTRUCTION_LIST = ["cls", "jmp", "jmpo", "call", "ret", "seq", "sneq", "mov", "add", "sub", "or", "and", "xor", "rsh",
+                    "lsh", "rand", "draw", "font", "bcd", "skp", "sknp", "wkey", "str", "ldr", "raw"]
+HEX_CHARACTERS = "0123456789abcdef"
+
+
+class TokenType(enum.Enum):
+    INSTRUCTION = 0
+    CONSTANT = 1
+    REGISTER = 2
+    INDEX_REGISTER = 3
+    DELAY_REGISTER = 4
+    SOUND_REGISTER = 5
+    LABEL = 6
+
+
+def get_type(token: str) -> typing.Union[TokenType, None]:
+    if len(token) == 0:
+        return
+    if token in INSTRUCTION_LIST:
+        return TokenType.INSTRUCTION
+    elif token == "i":
+        return TokenType.INDEX_REGISTER
+    elif token == "d":
+        return TokenType.DELAY_REGISTER
+    elif token == "s":
+        return TokenType.SOUND_REGISTER
+    elif len(token) == 2 and token[0] == "v" and token[1] in HEX_CHARACTERS:
+        return TokenType.REGISTER
+    elif (token[:2] == "0x" and all(c in HEX_CHARACTERS for c in token)) or token.isdecimal():
+        return TokenType.CONSTANT
+    else:
+        return TokenType.LABEL
 
 
 def remove_whitespace_and_split(s: str) -> [str]:
