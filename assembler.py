@@ -75,9 +75,9 @@ def remove_whitespace_and_split(s: str) -> [str]:
     return result, source_map
 
 
-def find_labels(instructions: [str], source_map: dict) -> dict:
+def find_labels(source_lines: [str], source_map: dict) -> dict:
     labels = {}
-    for num, line in enumerate(instructions):
+    for num, line in enumerate(source_lines):
         index = line.find(":")
         if index != -1:
             label = line[:index]
@@ -89,9 +89,9 @@ def find_labels(instructions: [str], source_map: dict) -> dict:
 
 
 def assemble(assembly: str) -> bytes:
-    instructions, source_map = remove_whitespace_and_split(assembly)
+    source_lines, source_map = remove_whitespace_and_split(assembly)
 
-    labels = find_labels(instructions, source_map)
+    labels = find_labels(source_lines, source_map)
 
     output = b""
     return output
