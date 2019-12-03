@@ -75,8 +75,23 @@ def remove_whitespace_and_split(s: str) -> [str]:
     return result, source_map
 
 
+def find_labels(instructions: [str], source_map: dict) -> dict:
+    labels = {}
+    for num, line in enumerate(instructions):
+        index = line.find(":")
+        if index != -1:
+            label = line[:index]
+            if get_type(label) != TokenType.LABEL:
+                raise Exception(f"Invalid label at line {source_map[num]}: {label}")
+            labels[label] = num
+
+    return labels
+
+
 def assemble(assembly: str) -> bytes:
     instructions, source_map = remove_whitespace_and_split(assembly)
+
+    labels = find_labels(instructions, source_map)
 
     output = b""
     return output
