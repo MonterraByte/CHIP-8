@@ -53,7 +53,7 @@ def get_type(token: str) -> typing.Union[TokenType, None]:
         return TokenType.SOUND
     elif len(token) == 2 and token[0] == "v" and token[1] in HEX_CHARACTERS:
         return TokenType.REGISTER
-    elif (token[:2] == "0x" and all(c in HEX_CHARACTERS for c in token)) or token.isdecimal():
+    elif (token[:2] == "0x" and all(c in HEX_CHARACTERS for c in token[3:])) or token.isdecimal():
         return TokenType.CONSTANT
     else:
         return TokenType.LABEL
