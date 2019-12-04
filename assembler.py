@@ -71,7 +71,7 @@ def remove_whitespace_and_split(s: str) -> [str]:
 
         if final_line != "":
             result.append(final_line)
-            source_map[len(result)] = num + 1
+            source_map[len(result) - 1] = num + 1
     return result, source_map
 
 
