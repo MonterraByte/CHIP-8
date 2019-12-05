@@ -15,24 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from PySide2.QtCore import QSize
 from PySide2.QtGui import QImage
 
 DISPLAY_WIDTH = 64
 DISPLAY_HEIGHT = 32
 
 
-class VideoMemory(bytearray):
+class VideoMemory(QImage):
     def __init__(self):
-        super().__init__(DISPLAY_WIDTH * DISPLAY_HEIGHT)
-
-    def draw(self, image: QImage):
-        for address, data in enumerate(self):
-            x = address % DISPLAY_WIDTH
-            y = address // DISPLAY_WIDTH
-            if data:
-                image.setPixel(x, y, 1)
-            else:
-                image.setPixel(x, y, 0)
+        super().__init__(QSize(DISPLAY_WIDTH, DISPLAY_HEIGHT), QImage.Format_Mono)
+        self.fill(0)
 
     def draw_sprite(self, x, y, sprite):
         collision = False
@@ -40,15 +33,14 @@ class VideoMemory(bytearray):
             if y + line < DISPLAY_HEIGHT:
                 for offset in range(8):
                     if x + offset < DISPLAY_WIDTH:
-                        address = (DISPLAY_WIDTH * (y + line)) + x + offset
-                        current_value = self[address]
+                        current_value = self.pixel(x + offset, y + line) & 0x00FFFFFF
                         new_value = ((sprite[line] & (0b10000000 >> offset)) >> 7 - offset)
 
                         if current_value and new_value:
                             collision = True
-                            self[address] = 0
+                            self.setPixel(x + offset, y + line, 0)
                         elif new_value:
-                            self[address] = 1
+                            self.setPixel(x + offset, y + line, 1)
 
         return collision
 

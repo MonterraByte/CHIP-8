@@ -43,9 +43,7 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.scale_factor = 1
 
-        self.image = QtGui.QImage(QtCore.QSize(DISPLAY_WIDTH, DISPLAY_HEIGHT), QtGui.QImage.Format_Mono)
-        self.image.fill(0)
-        self.pixmap = QtGui.QPixmap.fromImage(self.image)
+        self.pixmap = QtGui.QPixmap()
         self.graphicsScene = QtWidgets.QGraphicsScene(self)
         self.graphicsPixmapItem = self.graphicsScene.addPixmap(self.pixmap)
         self.graphicsView.setScene(self.graphicsScene)
@@ -83,9 +81,8 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
 
     @QtCore.Slot()
     def draw(self):
-        self.emulator.video_memory.draw(self.image)
-        self.pixmap = QtGui.QPixmap.fromImage(self.image).scaled(QtCore.QSize(DISPLAY_WIDTH * self.scale_factor,
-                                                                              DISPLAY_HEIGHT * self.scale_factor))
+        self.pixmap = QtGui.QPixmap.fromImage(self.emulator.video_memory).scaled(
+            QtCore.QSize(DISPLAY_WIDTH * self.scale_factor, DISPLAY_HEIGHT * self.scale_factor))
         self.graphicsPixmapItem.setPixmap(self.pixmap)
 
     def is_key_pressed(self, key: int) -> bool:
