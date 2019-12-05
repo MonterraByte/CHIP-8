@@ -274,11 +274,13 @@ def parse_instructions(source_lines: [str], source_map: dict, labels: dict) -> [
     instructions = []
     for num, line in enumerate(source_lines):
         current_line = line
-        if (label_sep := line.find(":")) != -1:
+        label_sep = line.find(":")
+        if label_sep != -1:
             current_line = current_line[label_sep + 1:].strip()
 
         arguments = []
-        if (space_index := current_line.find(" ")) != -1:
+        space_index = current_line.find(" ")
+        if space_index != -1:
             instruction = current_line[:space_index]
             if len(current_line) > space_index + 1:
                 args = current_line[space_index + 1:].split(",")
