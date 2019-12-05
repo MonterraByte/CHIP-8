@@ -25,6 +25,7 @@ parser = argparse.ArgumentParser(description="CHIP-8 assembler")
 parser.add_argument("asm", help="Path to the assembly file", type=pathlib.Path)
 parser.add_argument("out", help="Path to the output file", type=pathlib.Path)
 
+LOAD_ADDRESS = 0x200
 INSTRUCTION_LIST = ["cls", "jmp", "jmpo", "call", "ret", "seq", "sneq", "mov", "add", "sub", "or", "and", "xor", "rsh",
                     "lsh", "rand", "draw", "font", "bcd", "skp", "sknp", "wkey", "str", "ldr", "raw"]
 HEX_CHARACTERS = "0123456789abcdef"
@@ -41,9 +42,29 @@ class TokenType(enum.Enum):
 
 
 class Argument:
-    def __init__(self, value, t: TokenType):
-        self.v = value
+    def __init__(self, value, t: TokenType, labels: dict, line: int):
         self.t = t
+
+        if self.t == TokenType.CONSTANT:
+            if value[:2] == "0x":
+                self.v = int(value[2:], base=16)
+            else:
+                self.v = int(value)
+
+            if self.v > 0xFFF:
+                raise Exception(f"Constant value out of bounds (>0xFFF) in line {line}: {value}")
+        elif self.t == TokenType.LABEL:
+            self.v = LOAD_ADDRESS + labels[value] * 2
+
+            if self.v > 0xFFF:
+                raise Exception(f"Label value out of bounds (>0xFFF) in line {line}: {value}")
+        elif self.t == TokenType.REGISTER:
+            self.v = int(value[1:], base=16)
+
+            if self.v > 0xF:
+                raise Exception(f"Register value out of bounds (>0xF) in line {line}: {value}")
+        else:
+            self.v = value
 
 
 class Instruction:
@@ -109,6 +130,97 @@ class Instruction:
         self.instruction = instruction
         self.args = args
 
+    def assemble(self, line: int):
+        if self.instruction == "cls":
+            return 0x00E0.to_bytes(2, "big")
+        elif self.instruction == "jmp":
+            return (0x1000 + self.args[0].v).to_bytes(2, "big")
+        elif self.instruction == "jmpo":
+            return (0xA000 + self.args[0].v).to_bytes(2, "big")
+        elif self.instruction == "call":
+            return (0x2000 + self.args[0].v).to_bytes(2, "big")
+        elif self.instruction == "ret":
+            return 0x00EE.to_bytes(2, "big")
+        elif self.instruction == "seq":
+            if self.args[1].t == TokenType.CONSTANT:
+                if self.args[1].v > 0xFF:
+                    raise Exception(f"Argument out of range (>0xFF) in seq instruction at line {line}: {self.args[1].v}")
+                return (0x3000 + self.args[0].v * 0x0100 + self.args[1].v).to_bytes(2, "big")
+            else:
+                return (0x5000 + self.args[0].v * 0x0100 + self.args[1].v * 0x0010).to_bytes(2, "big")
+        elif self.instruction == "sneq":
+            if self.args[1].t == TokenType.CONSTANT:
+                if self.args[1].v > 0xFF:
+                    raise Exception(
+                        f"Argument out of range (>0xFF) in sneq instruction at line {line}: {self.args[1].v}")
+                return (0x4000 + self.args[0].v * 0x0100 + self.args[1].v).to_bytes(2, "big")
+            else:
+                return (0x9000 + self.args[0].v * 0x0100 + self.args[1].v * 0x0010).to_bytes(2, "big")
+        elif self.instruction == "mov":
+            if self.args[0].t == TokenType.REGISTER:
+                if self.args[1].t == TokenType.CONSTANT:
+                    if self.args[1].v > 0xFF:
+                        raise Exception(
+                            f"Argument out of range (>0xFF) in mov instruction at line {line}: {self.args[1].v}")
+                    return (0x6000 + self.args[0].v * 0x0100 + self.args[1].v).to_bytes(2, "big")
+                elif self.args[1].t == TokenType.REGISTER:
+                    return (0x8000 + self.args[0].v * 0x0100 + self.args[1].v * 0x0010).to_bytes(2, "big")
+                else:
+                    return (0xF007 + self.args[0].v * 0x0100).to_bytes(2, "big")
+            elif self.args[0].t == TokenType.INDEX:
+                return (0xA000 + self.args[1].v).to_bytes(2, "big")
+            elif self.args[0].t == TokenType.DELAY:
+                return (0xF015 + self.args[0].v * 0x0100).to_bytes(2, "big")
+            else:
+                return (0xF018 + self.args[0].v * 0x0100).to_bytes(2, "big")
+        elif self.instruction == "add":
+            if self.args[0].t == TokenType.REGISTER:
+                if self.args[1].t == TokenType.CONSTANT:
+                    if self.args[1].v > 0xFF:
+                        raise Exception(
+                            f"Argument out of range (>0xFF) in add instruction at line {line}: {self.args[1].v}")
+                    return (0x7000 + self.args[0].v * 0x0100 + self.args[1].v).to_bytes(2, "big")
+                else:
+                    return (0x8004 + self.args[0].v * 0x0100 + self.args[1].v * 0x0010).to_bytes(2, "big")
+            else:
+                return (0xF01E + self.args[1].v * 0x0100).to_bytes(2, "big")
+        elif self.instruction == "sub":
+            return (0x8005 + self.args[0].v * 0x0100 + self.args[1].v * 0x0010).to_bytes(2, "big")
+        elif self.instruction == "or":
+            return (0x8001 + self.args[0].v * 0x0100 + self.args[1].v * 0x0010).to_bytes(2, "big")
+        elif self.instruction == "and":
+            return (0x8002 + self.args[0].v * 0x0100 + self.args[1].v * 0x0010).to_bytes(2, "big")
+        elif self.instruction == "xor":
+            return (0x8003 + self.args[0].v * 0x0100 + self.args[1].v * 0x0010).to_bytes(2, "big")
+        elif self.instruction == "rsh":
+            return (0x8006 + self.args[0].v * 0x0100 + self.args[0].v * 0x0010).to_bytes(2, "big")
+        elif self.instruction == "lsh":
+            return (0x800E + self.args[0].v * 0x0100 + self.args[0].v * 0x0010).to_bytes(2, "big")
+        elif self.instruction == "rand":
+            if self.args[1].v > 0xFF:
+                raise Exception(f"Argument out of range (>0xFF) in rand instruction at line {line}: {self.args[1].v}")
+            return (0xC000 + self.args[0].v * 0x0100 + self.args[1].v).to_bytes(2, "big")
+        elif self.instruction == "draw":
+            if self.args[1].v > 0xF:
+                raise Exception(f"Argument out of range (>0xF) in draw instruction at line {line}: {self.args[1].v}")
+            return (0xD000 + self.args[0].v * 0x0100 + self.args[1].v * 0x0010 + self.args[2].v).to_bytes(2, "big")
+        elif self.instruction == "font":
+            return (0xF029 + self.args[0].v * 0x0100).to_bytes(2, "big")
+        elif self.instruction == "bcd":
+            return (0xF033 + self.args[0].v * 0x0100).to_bytes(2, "big")
+        elif self.instruction == "skp":
+            return (0xE09E + self.args[0].v * 0x0100).to_bytes(2, "big")
+        elif self.instruction == "sknp":
+            return (0xE0A1 + self.args[0].v * 0x0100).to_bytes(2, "big")
+        elif self.instruction == "wkey":
+            return (0xF00A + self.args[0].v * 0x0100).to_bytes(2, "big")
+        elif self.instruction == "str":
+            return (0xF055 + self.args[0].v * 0x0100).to_bytes(2, "big")
+        elif self.instruction == "ldr":
+            return (0xF065 + self.args[0].v * 0x0100).to_bytes(2, "big")
+        elif self.instruction == "raw":
+            return self.args[0].v.to_bytes(1, "big") + self.args[1].v.to_bytes(1, "big")
+
 
 def get_type(token: str) -> typing.Union[TokenType, None]:
     if len(token) == 0:
@@ -158,7 +270,7 @@ def find_labels(source_lines: [str], source_map: dict) -> dict:
     return labels
 
 
-def parse_instructions(source_lines: [str], source_map: dict) -> [Instruction]:
+def parse_instructions(source_lines: [str], source_map: dict, labels: dict) -> [Instruction]:
     instructions = []
     for num, line in enumerate(source_lines):
         current_line = line
@@ -171,7 +283,7 @@ def parse_instructions(source_lines: [str], source_map: dict) -> [Instruction]:
             if len(current_line) > space_index + 1:
                 args = current_line[space_index + 1:].split(",")
                 for arg in args:
-                    arguments.append(Argument(arg.strip(), get_type(arg.strip())))
+                    arguments.append(Argument(arg.strip(), get_type(arg.strip()), labels, line))
         else:
             instruction = current_line
 
@@ -179,14 +291,20 @@ def parse_instructions(source_lines: [str], source_map: dict) -> [Instruction]:
     return instructions
 
 
+def generate_assembly(instructions: [Instruction], source_map: dict) -> bytes:
+    output = bytearray()
+    for num, instruction in enumerate(instructions):
+        output += instruction.assemble(source_map[num])
+    return output
+
+
 def assemble(assembly: str) -> bytes:
     source_lines, source_map = remove_whitespace_and_split(assembly)
 
     labels = find_labels(source_lines, source_map)
-    instructions = parse_instructions(source_lines, source_map)
+    instructions = parse_instructions(source_lines, source_map, labels)
 
-    output = b""
-    return output
+    return generate_assembly(instructions, source_map)
 
 
 def main():
