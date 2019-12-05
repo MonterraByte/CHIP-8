@@ -103,6 +103,12 @@ class Emulator(QtCore.QObject):
             # Jump to address.
             if self.debug:
                 print(f"[{instruction:04X}] Jumping to address 0x{instruction & 0x0FFF:03X}")
+
+            if self.program_counter - 2 == instruction & 0x0FFF:
+                if self.debug:
+                    print(f"[{instruction:04X}] Infinite jump detected, halting")
+                self.parent.actionPause.setChecked(True)
+
             self.program_counter = instruction & 0x0FFF
         elif instruction & 0xF000 == 0x2000:
             # Call subroutine.
@@ -249,6 +255,12 @@ class Emulator(QtCore.QObject):
                 print(f"[{instruction:04X}] Jumping to address "
                       f"0x{(instruction & 0x0FFF) + self.v[0]:03X} (0x{instruction & 0x0FFF:03X} +"
                       f" 0x{self.v[0]:02X} from register 0)")
+
+            if self.program_counter - 2 == (instruction & 0x0FFF) + self.v[0]:
+                if self.debug:
+                    print(f"[{instruction:04X}] Infinite jump detected, halting")
+                self.parent.actionPause.setChecked(True)
+
             self.program_counter = (instruction & 0x0FFF) + self.v[0]
         elif instruction & 0xF000 == 0xC000:
             # Move value to the index register.
