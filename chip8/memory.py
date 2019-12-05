@@ -42,5 +42,13 @@ class Memory(bytearray):
                 s += f"\n{address:03X}: {data:02X}"
             else:
                 s += f" {data:02X}"
-        return s[1:]
+
+        v = ""
+        for line in s[1:].splitlines(keepends=True):
+            if line[5:] == "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\n":
+                if v[-4:-1] != "...":
+                    v += "...\n"
+            else:
+                v += line
+        return v
 
