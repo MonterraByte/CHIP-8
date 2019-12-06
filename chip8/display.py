@@ -45,7 +45,7 @@ class VideoMemory(QImage):
         return collision
 
     def reset(self):
-        self.__init__()
+        self.fill(0)
 
     def __str__(self):
         s = ""
