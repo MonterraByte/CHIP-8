@@ -13,7 +13,7 @@
 | sneq | Vx, NN or Vx, Vy | 4xNN or 9xy0 | Skips the next instruction if the arguments have different values. |
 | mov  | Vx, NN or Vx, Vy or I, NNN (or LABEL) or Vx, D or D, Vx or S, Vx | 6xNN or 8xy0 or ANNN or Fx07 or Fx15 or Fx18 | Assigns the first argument the value of the second argument. |
 | add  | Vx, NN or Vx, Vy or I, Vx | 7xNN or 8xy4 or Fx1E | Adds the value of the second argument to Vx. (If the second argument is a constant, Vf isn't modified) |
-| sub  | Vx, Vy    | 8xy5   | Subtracts the value of the first argument from Vx. (Vf is set to 1 when there isn't a borrow, 0 otherwise) |
+| sub  | Vx, Vy    | 8xy5   | Subtracts the value of the second argument from Vx. (Vf is set to 1 when there isn't a borrow, 0 otherwise) |
 | or   | Vx, Vy    | 8xy1   | ORs Vx with the value of Vy. |
 | and  | Vx, Vy    | 8xy2   | ANDs Vx with the value of Vy. |
 | xor  | Vx, Vy    | 8xy3   | XORs Vx with the value of Vy.|
