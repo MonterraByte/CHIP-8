@@ -17,6 +17,13 @@ SPLASH: cls
         mov I, FONT_G
         draw V0, V1, 6 
 
+MENU:   wkey V2
+        seq V2, 5
+        jmp MENU
+        jmp GAME
+
+GAME:   cls
+
 LOOP:   jmp LOOP
 
 # 11111000   F8
