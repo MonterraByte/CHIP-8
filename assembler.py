@@ -226,7 +226,7 @@ def get_type(token: str) -> typing.Union[TokenType, None]:
         return TokenType.INSTRUCTION
     elif token == "i":
         return TokenType.INDEX
-    elif token == "d":
+    elif token == "t":
         return TokenType.DELAY
     elif token == "s":
         return TokenType.SOUND

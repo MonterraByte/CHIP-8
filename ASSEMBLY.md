@@ -11,7 +11,7 @@
 | ret  |           | 00EE   | Returns from subroutine. |
 | seq  | Vx, NN or Vx, Vy | 3xNN or 5xy0 | Skips the next instruction if the arguments have the same value. |
 | sneq | Vx, NN or Vx, Vy | 4xNN or 9xy0 | Skips the next instruction if the arguments have different values. |
-| mov  | Vx, NN or Vx, Vy or I, NNN (or LABEL) or Vx, D or D, Vx or S, Vx | 6xNN or 8xy0 or ANNN or Fx07 or Fx15 or Fx18 | Assigns the first argument the value of the second argument. |
+| mov  | Vx, NN or Vx, Vy or I, NNN (or LABEL) or Vx, T or T, Vx or S, Vx | 6xNN or 8xy0 or ANNN or Fx07 or Fx15 or Fx18 | Assigns the first argument the value of the second argument. |
 | add  | Vx, NN or Vx, Vy or I, Vx | 7xNN or 8xy4 or Fx1E | Adds the value of the second argument to Vx. (If the second argument is a constant, Vf isn't modified) |
 | sub  | Vx, Vy    | 8xy5   | Subtracts the value of the second argument from Vx. (Vf is set to 1 when there isn't a borrow, 0 otherwise) |
 | or   | Vx, Vy    | 8xy1   | ORs Vx with the value of Vy. |
@@ -37,7 +37,7 @@
 | Vn        | General purpose registers                                                  |
 | Vf        | Register set by some instructions (usually containing the carry flag)      |
 | I         | Index register, its value is used as a memory address by some instructions |
-| D         | Delay register                                                             |
+| T         | Delay (timer) register                                                             |
 | S         | Sound register                                                             |
 
 ## Labels
