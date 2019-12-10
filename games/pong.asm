@@ -23,8 +23,28 @@ MENU:   wkey V2
         jmp GAME
 
 GAME:   cls
+        mov V0, 01
+        mov V1, 0D # 13
+
+        mov V2, 3E # 62
+        mov V3, 0D # 13
+
+        mov I, PADDLE
+        draw V0, V1, 5
+        draw V2, V3, 5
+
+
 
 LOOP:   jmp LOOP
+
+# 10000000 = 80
+# 10000000 = 80
+# 10000000 = 80
+# 10000000 = 80
+# 10000000 = 80
+PADDLE: raw 80, 80
+        raw 80, 80
+        raw 80, 80
 
 # 11111000   F8
 # 10000000   80
