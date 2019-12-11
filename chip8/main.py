@@ -70,6 +70,7 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         if args.rom:
             self.load_rom(args.rom)
             self.new_emulator()
+            self.emulator.timer.start()
             self.timer.start()
 
         self.actionPause.toggled.connect(self.toggle_emulation)
@@ -91,9 +92,11 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
     @QtCore.Slot()
     def toggle_emulation(self, checked):
         if checked:
+            self.emulator.timer.stop()
             self.timer.stop()
         else:
             self.timer.start()
+            self.emulator.timer.start()
 
     @QtCore.Slot()
     def open_rom(self):

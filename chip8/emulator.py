@@ -25,6 +25,7 @@ from .memory import Memory, FONT_START
 
 PROGRAM_COUNTER_START = 512
 STACK_POINTER_START = 82
+TIMER_INTERVAL = 16
 
 
 class UnimplementedInstruction(Exception):
@@ -57,6 +58,9 @@ class Emulator(QtCore.QObject):
 
         self.memory = Memory()
         self.video_memory = VideoMemory()
+        self.timer = QtCore.QTimer(self)
+        self.timer.setInterval(TIMER_INTERVAL)
+        self.timer.timeout.connect(self.decrement_timers)
 
         self.memory.load_font(FONT_DATA)
         self.memory.load_rom(rom)
@@ -64,6 +68,15 @@ class Emulator(QtCore.QObject):
         if self.debug:
             print("Memory:")
             print(self.memory)
+
+    @QtCore.Slot()
+    def decrement_timers(self):
+        if self.delay_timer > 0:
+            self.delay_timer -= 1
+
+        if self.sound_timer > 0:
+            self.sound_timer -= 1
+
 
     @QtCore.Slot()
     def run_once(self):
@@ -76,13 +89,6 @@ class Emulator(QtCore.QObject):
                     break
             else:
                 return
-
-        # This isn't very accurate
-        if self.delay_timer > 0:
-            self.delay_timer -= 1
-
-        if self.sound_timer > 0:
-            self.sound_timer -= 1
 
         instruction = int.from_bytes(self.memory[self.program_counter:self.program_counter+2], byteorder="big")
         self.program_counter += 2
