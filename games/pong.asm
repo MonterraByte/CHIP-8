@@ -43,6 +43,15 @@ LOOP:   mov V5, 01
         sknp V5
         call LEFT_DN
 
+        mov V5, 0C
+        sknp V5
+        call RGHT_UP
+
+        mov V5, 0D
+        sknp V5
+        call RGHT_DN
+
+
         jmp LOOP
 
 LEFT_UP:draw V0, V1, 5
@@ -59,6 +68,22 @@ LEFT_DN:draw V0, V1, 5
         seq VF, 00 # if V1 > 1B (27), V1 <- 00
         mov V1, 00
         draw V0, V1, 5
+        ret
+
+RGHT_UP:draw V2, V3, 5
+        sub V3, V0 # V1 - 1
+        seq VF, 01
+        mov V3, 1B
+        draw V2, V3, 5
+        ret
+
+RGHT_DN:draw V2, V3, 5
+        add V3, V0 # V1 + 1
+        mov V5, V3
+        sub V5, VD
+        seq VF, 00 # if V1 > 1B (27), V1 <- 00
+        mov V3, 00
+        draw V2, V3, 5
         ret
 
 # 10000000 = 80
