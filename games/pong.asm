@@ -23,6 +23,8 @@ MENU:   wkey V2
         jmp GAME
 
 GAME:   cls
+        mov VD, 1C # 28 = 32 - 4
+
         mov V0, 01
         mov V1, 0D # 13
 
@@ -33,9 +35,31 @@ GAME:   cls
         draw V0, V1, 5
         draw V2, V3, 5
 
+LOOP:   mov V5, 01
+        sknp V5
+        call LEFT_UP
 
+        mov V5, 04
+        sknp V5
+        call LEFT_DN
 
-LOOP:   jmp LOOP
+        jmp LOOP
+
+LEFT_UP:draw V0, V1, 5
+        sub V1, V0 # V1 - 1
+        seq VF, 01
+        mov V1, 1B
+        draw V0, V1, 5
+        ret
+
+LEFT_DN:draw V0, V1, 5
+        add V1, V0 # V1 + 1
+        mov V5, V1
+        sub V5, VD
+        seq VF, 00 # if V1 > 1B (27), V1 <- 00
+        mov V1, 00
+        draw V0, V1, 5
+        ret
 
 # 10000000 = 80
 # 10000000 = 80
