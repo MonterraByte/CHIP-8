@@ -35,20 +35,20 @@ GAME:   cls
         draw V0, V1, 5
         draw V2, V3, 5
 
-LOOP:   mov V5, 01
-        sknp V5
+LOOP:   mov VC, 01
+        sknp VC
         call LEFT_UP
 
-        mov V5, 04
-        sknp V5
+        mov VC, 04
+        sknp VC
         call LEFT_DN
 
-        mov V5, 0C
-        sknp V5
+        mov VC, 0C
+        sknp VC
         call RGHT_UP
 
-        mov V5, 0D
-        sknp V5
+        mov VC, 0D
+        sknp VC
         call RGHT_DN
 
 
@@ -63,8 +63,8 @@ LEFT_UP:draw V0, V1, 5
 
 LEFT_DN:draw V0, V1, 5
         add V1, V0 # V1 + 1
-        mov V5, V1
-        sub V5, VD
+        mov VC, V1
+        sub VC, VD
         seq VF, 00 # if V1 > 1B (27), V1 <- 00
         mov V1, 00
         draw V0, V1, 5
@@ -79,8 +79,8 @@ RGHT_UP:draw V2, V3, 5
 
 RGHT_DN:draw V2, V3, 5
         add V3, V0 # V1 + 1
-        mov V5, V3
-        sub V5, VD
+        mov VC, V3
+        sub VC, VD
         seq VF, 00 # if V1 > 1B (27), V1 <- 00
         mov V3, 00
         draw V2, V3, 5
