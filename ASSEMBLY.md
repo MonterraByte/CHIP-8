@@ -6,7 +6,7 @@
 |:----:|:---------:|:------:| ------------------ |
 | cls  |           | 00E0   | Clears the screen. |
 | jmp  | NNN (or LABEL) | 1NNN   | Jumps to address NNN. |
-| jmpo | NNN       | ANNN   | Jumps to the sum of NNN and the value in V0. |
+| jmpo | NNN (or LABEL) | ANNN   | Jumps to the sum of NNN and the value in V0. |
 | call | NNN (or LABEL) | 2NNN   | Call subroutine at address NNN. |
 | ret  |           | 00EE   | Returns from subroutine. |
 | seq  | Vx, NN or Vx, Vy | 3xNN or 5xy0 | Skips the next instruction if the arguments have the same value. |

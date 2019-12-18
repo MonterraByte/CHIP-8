@@ -79,13 +79,13 @@ class Instruction:
         elif instruction == "draw" and len(args) != 3:
             raise Exception(f"{instruction} instruction (at line {line}) takes three arguments, but got {len(args)}")
 
-        if instruction in ("jmpo", "str", "ldr") and args[0].t != TokenType.CONSTANT:
+        if instruction in ("str", "ldr") and args[0].t != TokenType.CONSTANT:
             raise Exception(f"{instruction} instruction (at line {line}) takes a CONSTANT argument, but got a"
                             f"{args[0].t} instead: {args[0].v}")
         elif instruction in ("rsh", "lsh", "font", "bcd", "skp", "sknp", "wkey") and args[0].t != TokenType.REGISTER:
             raise Exception(f"{instruction} instruction (at line {line}) takes a REGISTER argument, but got a"
                             f"{args[0].t} instead: {args[0].v}")
-        elif instruction in ("jmp", "call") and args[0].t != TokenType.CONSTANT and args[0].t != TokenType.LABEL:
+        elif instruction in ("jmp", "jmpo", "call") and args[0].t != TokenType.CONSTANT and args[0].t != TokenType.LABEL:
             raise Exception(f"{instruction} instruction (at line {line}) takes a CONSTANT or LABEL argument, but got a"
                             f"{args[0].t} instead: {args[0].v}")
         elif instruction in ("seq", "sneq") and not (args[0].t == TokenType.REGISTER
