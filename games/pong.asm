@@ -31,9 +31,14 @@ GAME:   cls
         mov V3, 3E # 62
         mov V4, 0D # 13
 
+        mov V5, 1F # 31
+        mov V6, 0F # 15
+        rand V0, 1E # 0001 1110
+
         mov I, PADDLE
         draw V1, V2, 5
         draw V3, V4, 5
+        draw V5, V6, 1
 
 LOOP:   mov VC, 01
         sknp VC
@@ -51,6 +56,7 @@ LOOP:   mov VC, 01
         sknp VC
         call RGHT_DN
 
+        call MOVBALL
 
         jmp LOOP
 
@@ -84,6 +90,53 @@ RGHT_DN:draw V3, V4, 5
         seq VF, 00 # if V2 > 1B (27), V2 <- 00
         mov V4, 00
         draw V3, V4, 5
+        ret
+
+MOVBALL:draw V5, V6, 1
+        jmpo MJMPTBL
+
+MJMPTBL:jmp BALL_M0
+        jmp BALL_M1
+        jmp BALL_M2
+        jmp BALL_M3
+        jmp BALL_M4
+        jmp BALL_M5
+        jmp BALL_M6
+        jmp BALL_M7
+        jmp BALL_M8
+        jmp BALL_M9
+        jmp BALL_MA
+        jmp BALL_MB
+        jmp BALL_MC
+        jmp BALL_MD
+        jmp BALL_ME
+        jmp BALL_MF
+
+BALL_M0:jmp BMOVRGT
+BALL_M1:jmp BMOVRGT
+BALL_M2:jmp BMOVRGT
+BALL_M3:jmp BMOVRGT
+BALL_M4:jmp BMOVRGT
+BALL_M5:jmp BMOVRGT
+BALL_M6:jmp BMOVRGT
+BALL_M7:jmp BMOVRGT
+
+BMOVRGT:add V5, 01
+        draw V5, V6, 1
+        ret
+
+
+BALL_M8:jmp BMOVLFT
+BALL_M9:jmp BMOVLFT
+BALL_MA:jmp BMOVLFT
+BALL_MB:jmp BMOVLFT
+BALL_MC:jmp BMOVLFT
+BALL_MD:jmp BMOVLFT
+BALL_ME:jmp BMOVLFT
+BALL_MF:jmp BMOVLFT
+
+BMOVLFT:sub V5, V1
+        draw V5, V6, 1
         ret
 
 # 10000000 = 80
