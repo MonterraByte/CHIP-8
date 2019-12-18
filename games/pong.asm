@@ -1,39 +1,39 @@
 SPLASH: cls
-        mov V0, 15
-        mov V1, 6
+        mov V1, 15
+        mov V2, 6
 
         mov I, FONT_P
-        draw V0, V1, 6
+        draw V1, V2, 6
 
-        add V0, 5
+        add V1, 5
         mov I, FONT_O
-        draw V0, V1, 6 
+        draw V1, V2, 6 
 
-        add V0, 6
+        add V1, 6
         mov I, FONT_N
-        draw V0, V1, 6 
+        draw V1, V2, 6 
 
-        add V0, 6
+        add V1, 6
         mov I, FONT_G
-        draw V0, V1, 6 
+        draw V1, V2, 6 
 
-MENU:   wkey V2
-        seq V2, 5
+MENU:   wkey V3
+        seq V3, 5
         jmp MENU
         jmp GAME
 
 GAME:   cls
         mov VD, 1C # 28 = 32 - 4
 
-        mov V0, 01
-        mov V1, 0D # 13
+        mov V1, 01
+        mov V2, 0D # 13
 
-        mov V2, 3E # 62
-        mov V3, 0D # 13
+        mov V3, 3E # 62
+        mov V4, 0D # 13
 
         mov I, PADDLE
-        draw V0, V1, 5
-        draw V2, V3, 5
+        draw V1, V2, 5
+        draw V3, V4, 5
 
 LOOP:   mov VC, 01
         sknp VC
@@ -54,36 +54,36 @@ LOOP:   mov VC, 01
 
         jmp LOOP
 
-LEFT_UP:draw V0, V1, 5
-        sub V1, V0 # V1 - 1
+LEFT_UP:draw V1, V2, 5
+        sub V2, V1 # V2 - 1
         seq VF, 01
-        mov V1, 1B
-        draw V0, V1, 5
+        mov V2, 1B
+        draw V1, V2, 5
         ret
 
-LEFT_DN:draw V0, V1, 5
-        add V1, V0 # V1 + 1
-        mov VC, V1
+LEFT_DN:draw V1, V2, 5
+        add V2, V1 # V2 + 1
+        mov VC, V2
         sub VC, VD
-        seq VF, 00 # if V1 > 1B (27), V1 <- 00
-        mov V1, 00
-        draw V0, V1, 5
+        seq VF, 00 # if V2 > 1B (27), V2 <- 00
+        mov V2, 00
+        draw V1, V2, 5
         ret
 
-RGHT_UP:draw V2, V3, 5
-        sub V3, V0 # V1 - 1
+RGHT_UP:draw V3, V4, 5
+        sub V4, V1 # V2 - 1
         seq VF, 01
-        mov V3, 1B
-        draw V2, V3, 5
+        mov V4, 1B
+        draw V3, V4, 5
         ret
 
-RGHT_DN:draw V2, V3, 5
-        add V3, V0 # V1 + 1
-        mov VC, V3
+RGHT_DN:draw V3, V4, 5
+        add V4, V1 # V2 + 1
+        mov VC, V4
         sub VC, VD
-        seq VF, 00 # if V1 > 1B (27), V1 <- 00
-        mov V3, 00
-        draw V2, V3, 5
+        seq VF, 00 # if V2 > 1B (27), V2 <- 00
+        mov V4, 00
+        draw V3, V4, 5
         ret
 
 # 10000000 = 80
