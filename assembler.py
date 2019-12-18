@@ -133,7 +133,7 @@ class Instruction:
         elif self.instruction == "jmp":
             return (0x1000 + self.args[0].v).to_bytes(2, "big")
         elif self.instruction == "jmpo":
-            return (0xA000 + self.args[0].v).to_bytes(2, "big")
+            return (0xB000 + self.args[0].v).to_bytes(2, "big")
         elif self.instruction == "call":
             return (0x2000 + self.args[0].v).to_bytes(2, "big")
         elif self.instruction == "ret":
