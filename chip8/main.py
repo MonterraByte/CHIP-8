@@ -50,6 +50,7 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.close_shortcut = QtWidgets.QShortcut(QtGui.QKeySequence(QtGui.QKeySequence.Quit), self)
         self.close_shortcut.activated.connect(self.close)
+        self.actionOpen.setShortcut(QtGui.QKeySequence.Open)  # Ctrl + O
         self.actionPause.setShortcut(QtGui.QKeySequence.Print)  # Ctrl + P
         self.actionRestart.setShortcut(QtGui.QKeySequence.Replace)  # Ctrl + R
         self.actionRestart.setEnabled(False)
