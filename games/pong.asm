@@ -35,6 +35,16 @@ GAME:   cls
         mov V6, 0F # 15
         rand V0, 1E # 0001 1110
 
+        mov V7, 0 # Left player score
+        mov V8, 0 # Right player score
+
+        font V7
+        mov VC, 10
+        draw VC, V1, 5
+        font V8
+        mov VC, 2A
+        draw VC, V1, 5
+
         mov I, PADDLE
         draw V1, V2, 5
         draw V3, V4, 5
