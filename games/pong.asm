@@ -23,7 +23,6 @@ MENU:   wkey V3
         jmp GAME
 
 GAME:   cls
-        mov VD, 1C # 28 = 32 - 4
 
         mov V1, 01
         mov V2, 0D # 13
@@ -79,9 +78,7 @@ LEFT_UP:draw V1, V2, 5
 
 LEFT_DN:draw V1, V2, 5
         add V2, V1 # V2 + 1
-        mov VC, V2
-        sub VC, VD
-        seq VF, 00 # if V2 > 1B (27), V2 <- 00
+        sneq V2, 1C # if V2 = 28, V2 <- 00
         mov V2, 00
         draw V1, V2, 5
         ret
@@ -95,9 +92,7 @@ RGHT_UP:draw V3, V4, 5
 
 RGHT_DN:draw V3, V4, 5
         add V4, V1 # V2 + 1
-        mov VC, V4
-        sub VC, VD
-        seq VF, 00 # if V2 > 1B (27), V2 <- 00
+        sneq V2, 1C # if V2 = 28, V2 <- 00
         mov V4, 00
         draw V3, V4, 5
         ret
