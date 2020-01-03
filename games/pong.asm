@@ -24,17 +24,17 @@ MENU:   wkey V3
 
 GAME:   cls
         mov VB, 00 # whether or not the ball collided with a paddle
-        mov VD, 00
+        mov VD, 00 # whether or the game has ended
 
-        mov V1, 01
-        mov V2, 0D # 13
+        mov V1, 01 # X coordinate of the left paddle
+        mov V2, 0D # 13, Y coordinate of the left paddle
 
-        mov V3, 3E # 62
-        mov V4, 0D # 13
+        mov V3, 3E # 62, X coordinate of the right paddle
+        mov V4, 0D # 13, Y coordinate of the right paddle
 
-        mov V5, 1F # 31
-        mov V6, 0F # 15
-        rand V0, 1E # 0001 1110
+        mov V5, 1F # 31, X coordinate of the ball
+        mov V6, 0F # 15, Y coordinate of the ball
+        rand V0, 1E # 0001 1110, ball direction
 
         mov V7, 0 # Left player score
         mov V8, 0 # Right player score
