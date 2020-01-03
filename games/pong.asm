@@ -7,15 +7,15 @@ SPLASH: cls
 
         add V1, 5
         mov I, FONT_O
-        draw V1, V2, 6 
+        draw V1, V2, 6
 
         add V1, 6
         mov I, FONT_N
-        draw V1, V2, 6 
+        draw V1, V2, 6
 
         add V1, 6
         mov I, FONT_G
-        draw V1, V2, 6 
+        draw V1, V2, 6
 
 MENU:   wkey V3
         seq V3, 5
@@ -289,11 +289,11 @@ L_WINS: mov V1, 12
         add V1, 7
         mov I, FONT_E
         draw V1, V2, 6
- 
+
         add V1, 7
         mov I, FONT_F
         draw V1, V2, 6
- 
+
         add V1, 7
         mov I, FONT_T
         draw V1, V2, 6
@@ -308,15 +308,15 @@ R_WINS: mov V1, 0F
         add V1, 6
         mov I, FONT_I
         draw V1, V2, 6
- 
+
         add V1, 7
         mov I, FONT_G
         draw V1, V2, 6
- 
+
         add V1, 7
         mov I, FONT_H
         draw V1, V2, 6
- 
+
         add V1, 7
         mov I, FONT_T
         draw V1, V2, 6
