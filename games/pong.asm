@@ -23,6 +23,7 @@ MENU:   wkey V3
         jmp GAME
 
 GAME:   cls
+        mov VB, 00 # whether or not the ball collided with a paddle
         mov VD, 00
 
         mov V1, 01
@@ -121,37 +122,135 @@ MJMPTBL:jmp BALL_M0
         jmp BALL_ME
         jmp BALL_MF
 
-BALL_M0:jmp BMOVRGT
-BALL_M1:jmp BMOVRGT
-BALL_M2:jmp BMOVRGT
-BALL_M3:jmp BMOVRGT
-BALL_M4:jmp BMOVRGT
-BALL_M5:jmp BMOVRGT
-BALL_M6:jmp BMOVRGT
-BALL_M7:jmp BMOVRGT
+BALL_M0:seq VB, 1
+        jmp BMOVRGT
+
+        mov VB, 0
+        mov V0, 10 # 8 * 2
+        jmp BALL_M8
+
+BALL_M1:seq VB, 1
+        jmp BMOVRGT
+
+        mov VB, 0
+        mov V0, 12 # 9 * 2
+        jmp BALL_M9
+
+BALL_M2:seq VB, 1
+        jmp BMOVRGT
+
+        mov VB, 0
+        mov V0, 14 # A * 2
+        jmp BALL_MA
+
+BALL_M3:seq VB, 1
+        jmp BMOVRGT
+
+        mov VB, 0
+        mov V0, 16 # B * 2
+        jmp BALL_MB
+
+BALL_M4:seq VB, 1
+        jmp BMOVRGT
+
+        mov VB, 0
+        mov V0, 18 # C * 2
+        jmp BALL_MC
+
+BALL_M5:seq VB, 1
+        jmp BMOVRGT
+
+        mov VB, 0
+        mov V0, 1A # D * 2
+        jmp BALL_MD
+
+BALL_M6:seq VB, 1
+        jmp BMOVRGT
+
+        mov VB, 0
+        mov V0, 1C # E * 2
+        jmp BALL_ME
+
+BALL_M7:seq VB, 1
+        jmp BMOVRGT
+
+        mov VB, 0
+        mov V0, 1E # F * 2
+        jmp BALL_MF
 
 BMOVRGT:add V5, 01
         sneq V5, 40 # call L_SCORE if V5 = 64
         call L_SCORE
 
         draw V5, V6, 1
+        sneq V5, 3E # if the ball is in the paddle's column, check for collision
+        mov VB, VF
         ret
 
 
-BALL_M8:jmp BMOVLFT
-BALL_M9:jmp BMOVLFT
-BALL_MA:jmp BMOVLFT
-BALL_MB:jmp BMOVLFT
-BALL_MC:jmp BMOVLFT
-BALL_MD:jmp BMOVLFT
-BALL_ME:jmp BMOVLFT
-BALL_MF:jmp BMOVLFT
+BALL_M8:seq VB, 1
+        jmp BMOVLFT
+
+        mov VB, 0
+        mov V0, 00
+        jmp BALL_M0
+
+BALL_M9:seq VB, 1
+        jmp BMOVLFT
+
+        mov VB, 0
+        mov V0, 02 # 1 * 2
+        jmp BALL_M1
+
+BALL_MA:seq VB, 1
+        jmp BMOVLFT
+
+        mov VB, 0
+        mov V0, 04 # 2 * 2
+        jmp BALL_M2
+
+BALL_MB:seq VB, 1
+        jmp BMOVLFT
+
+        mov VB, 0
+        mov V0, 06 # 3 * 2
+        jmp BALL_M3
+
+BALL_MC:seq VB, 1
+        jmp BMOVLFT
+
+        mov VB, 0
+        mov V0, 08 # 4 * 2
+        jmp BALL_M4
+
+BALL_MD:seq VB, 1
+        jmp BMOVLFT
+
+        mov VB, 0
+        mov V0, 0A # 5 * 2
+        jmp BALL_M5
+
+BALL_ME:seq VB, 1
+        jmp BMOVLFT
+
+        mov VB, 0
+        mov V0, 0C # 6 * 2
+        jmp BALL_M6
+
+BALL_MF:seq VB, 1
+        jmp BMOVLFT
+
+        mov VB, 0
+        mov V0, 0E # 7 * 2
+        jmp BALL_M7
 
 BMOVLFT:sub V5, V1
         seq VF, 01 # skip if V5 > 0
         call R_SCORE
 
         draw V5, V6, 1
+        sneq V5, 01 # if the ball is in the paddle's column, check for collision
+        mov VB, VF
         ret
 
 L_SCORE:font V7
