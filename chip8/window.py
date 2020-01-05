@@ -3,8 +3,8 @@
 # Form implementation generated from reading ui file 'chip8/window.ui',
 # licensing of 'chip8/window.ui' applies.
 #
-# Created: Fri Nov 29 22:37:32 2019
-#      by: pyside2-uic  running on PySide2 5.13.2
+# Created: Sun Jan  5 17:31:53 2020
+#      by: pyside2-uic  running on PySide2 5.14.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -13,23 +13,20 @@ from PySide2 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
+        MainWindow.resize(600, 340)
         MainWindow.setAcceptDrops(True)
         MainWindow.setUnifiedTitleAndToolBarOnMac(True)
         self.graphicsView = QtWidgets.QGraphicsView(MainWindow)
         self.graphicsView.setAcceptDrops(False)
         self.graphicsView.setObjectName("graphicsView")
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 32))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 600, 30))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
         self.menuEmulation = QtWidgets.QMenu(self.menubar)
         self.menuEmulation.setObjectName("menuEmulation")
         MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
         self.actionOpen = QtWidgets.QAction(MainWindow)
         self.actionOpen.setObjectName("actionOpen")
         self.actionExit = QtWidgets.QAction(MainWindow)
