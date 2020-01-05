@@ -97,7 +97,7 @@ RGHT_UP:draw V3, V4, 5
 
 RGHT_DN:draw V3, V4, 5
         add V4, V1 # V2 + 1
-        sneq V2, 1C # if V2 = 28, V2 <- 00
+        sneq V4, 1C # if V2 = 28, V2 <- 00
         mov V4, 00
         draw V3, V4, 5
         ret
