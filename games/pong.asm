@@ -122,59 +122,75 @@ MJMPTBL:jmp BALL_M0
         jmp BALL_ME
         jmp BALL_MF
 
-BALL_M0:seq VB, 1
+BALL_M0:sneq VB, 1
+        jmp COLL_M0
+
         jmp BMOVRGT
 
-        mov VB, 0
+COLL_M0:mov VB, 0
         mov V0, 10 # 8 * 2
         jmp BALL_M8
 
-BALL_M1:seq VB, 1
+BALL_M1:sneq VB, 1
+        jmp COLL_M1
+
         jmp BMOVRGT
 
-        mov VB, 0
+COLL_M1:mov VB, 0
         mov V0, 12 # 9 * 2
         jmp BALL_M9
 
-BALL_M2:seq VB, 1
+BALL_M2:sneq VB, 1
+        jmp COLL_M2
+
         jmp BMOVRGT
 
-        mov VB, 0
+COLL_M2:mov VB, 0
         mov V0, 14 # A * 2
         jmp BALL_MA
 
-BALL_M3:seq VB, 1
+BALL_M3:sneq VB, 1
+        jmp COLL_M3
+
         jmp BMOVRGT
 
-        mov VB, 0
+COLL_M3:mov VB, 0
         mov V0, 16 # B * 2
         jmp BALL_MB
 
-BALL_M4:seq VB, 1
+BALL_M4:sneq VB, 1
+        jmp COLL_M4
+
         jmp BMOVRGT
 
-        mov VB, 0
+COLL_M4:mov VB, 0
         mov V0, 18 # C * 2
         jmp BALL_MC
 
-BALL_M5:seq VB, 1
+BALL_M5:sneq VB, 1
+        jmp COLL_M5
+
         jmp BMOVRGT
 
-        mov VB, 0
+COLL_M5:mov VB, 0
         mov V0, 1A # D * 2
         jmp BALL_MD
 
-BALL_M6:seq VB, 1
+BALL_M6:sneq VB, 1
+        jmp COLL_M6
+
         jmp BMOVRGT
 
-        mov VB, 0
+COLL_M6:mov VB, 0
         mov V0, 1C # E * 2
         jmp BALL_ME
 
-BALL_M7:seq VB, 1
+BALL_M7:sneq VB, 1
+        jmp COLL_M7
+
         jmp BMOVRGT
 
-        mov VB, 0
+COLL_M7:mov VB, 0
         mov V0, 1E # F * 2
         jmp BALL_MF
 
@@ -188,59 +204,75 @@ BMOVRGT:add V5, 01
         ret
 
 
-BALL_M8:seq VB, 1
+BALL_M8:sneq VB, 1
+        jmp COLL_M8
+
         jmp BMOVLFT
 
-        mov VB, 0
+COLL_M8:mov VB, 0
         mov V0, 00
         jmp BALL_M0
 
-BALL_M9:seq VB, 1
+BALL_M9:sneq VB, 1
+        jmp COLL_M9
+
         jmp BMOVLFT
 
-        mov VB, 0
+COLL_M9:mov VB, 0
         mov V0, 02 # 1 * 2
         jmp BALL_M1
 
-BALL_MA:seq VB, 1
+BALL_MA:sneq VB, 1
+        jmp COLL_MA
+
         jmp BMOVLFT
 
-        mov VB, 0
+COLL_MA:mov VB, 0
         mov V0, 04 # 2 * 2
         jmp BALL_M2
 
-BALL_MB:seq VB, 1
+BALL_MB:sneq VB, 1
+        jmp COLL_MB
+
         jmp BMOVLFT
 
-        mov VB, 0
+COLL_MB:mov VB, 0
         mov V0, 06 # 3 * 2
         jmp BALL_M3
 
-BALL_MC:seq VB, 1
+BALL_MC:sneq VB, 1
+        jmp COLL_MC
+
         jmp BMOVLFT
 
-        mov VB, 0
+COLL_MC:mov VB, 0
         mov V0, 08 # 4 * 2
         jmp BALL_M4
 
-BALL_MD:seq VB, 1
+BALL_MD:sneq VB, 1
+        jmp COLL_MD
+
         jmp BMOVLFT
 
-        mov VB, 0
+COLL_MD:mov VB, 0
         mov V0, 0A # 5 * 2
         jmp BALL_M5
 
-BALL_ME:seq VB, 1
+BALL_ME:sneq VB, 1
+        jmp COLL_ME
+
         jmp BMOVLFT
 
-        mov VB, 0
+COLL_ME:mov VB, 0
         mov V0, 0C # 6 * 2
         jmp BALL_M6
 
-BALL_MF:seq VB, 1
+BALL_MF:sneq VB, 1
+        jmp COLL_MF
+
         jmp BMOVLFT
 
-        mov VB, 0
+COLL_MF:mov VB, 0
         mov V0, 0E # 7 * 2
         jmp BALL_M7
 
