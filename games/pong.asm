@@ -17,10 +17,10 @@ SPLASH: cls
         mov I, FONT_G
         draw V1, V2, 6
 
-MENU:   wkey V3
-        seq V3, 5
-        jmp MENU
+        wkey V3
+MLOOP:  skp V3
         jmp GAME
+        jmp MLOOP
 
 GAME:   cls
         mov VA, 00 # used to keep track of the ball's vertical movement
@@ -480,13 +480,10 @@ WINS:   mov V1, 10
         mov I, FONT_S
         draw V1, V2, 6
 
-WLOOP:  wkey V3
-        seq V3, 05
-        jmp WLOOP
-
-WLOOP2: skp V3
+        wkey V3
+WLOOP:  skp V3
         jmp SPLASH
-        jmp WLOOP2
+        jmp WLOOP
 
 
 # 10000000 = 80
