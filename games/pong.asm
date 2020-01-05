@@ -394,6 +394,10 @@ L_SCORE:font V7
         font V7
         seq V7, 0A
         draw VC, V1, 5
+
+        mov V5, 1F
+        mov V6, 0F
+        rand V0, 1E
         mov I, PADDLE
         ret
 
@@ -406,6 +410,10 @@ R_SCORE:font V8
         font V8
         seq V8, 0A
         draw VC, V1, 5
+
+        mov V5, 1F
+        mov V6, 0F
+        rand V0, 1E
         mov I, PADDLE
         ret
 
