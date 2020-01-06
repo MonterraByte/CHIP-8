@@ -26,11 +26,10 @@ from .emulator import Emulator
 from .error import Ui_ErrorWindow
 from .window import Ui_MainWindow
 
-FRAME_INTERVAL = 2
-
 parser = argparse.ArgumentParser(description="CHIP-8 emulator")
 parser.add_argument("rom", help="Path to the ROM file", type=pathlib.Path, nargs="?")
 parser.add_argument("--debug", help="Enable debug output", default=False, action="store_true")
+parser.add_argument("--interval", help="Interval between each interpreted instruction in ms (higher values make emulation slower, default is 2)", type=int, default=2)
 
 
 class Window(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -64,7 +63,7 @@ class Window(QtWidgets.QMainWindow, Ui_MainWindow):
         self.installEventFilter(self)
 
         self.timer = QtCore.QTimer(self)
-        self.timer.setInterval(FRAME_INTERVAL)
+        self.timer.setInterval(args.interval)
 
         self.rom = None
         self.emulator = None
