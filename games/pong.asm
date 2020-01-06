@@ -201,7 +201,7 @@ BALL_M6:add V6, 1
 BALL_M7:add V6, 2
         sneq V6, 21
         jmp VC21_M7
-        sneq V6, 21
+        sneq V6, 20
         jmp VC20_M7
 
         jmp BMOVRGT
@@ -281,7 +281,7 @@ BALL_ME:add V6, 1
 BALL_MF:add V6, 2
         sneq V6, 21
         jmp VC21_MF
-        sneq V6, 21
+        sneq V6, 20
         jmp VC20_MF
 
         jmp BMOVLFT
