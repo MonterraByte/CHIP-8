@@ -40,6 +40,8 @@ GAME:   cls
         mov V7, 0 # Left player score
         mov V8, 0 # Right player score
 
+        mov V9, 10 # constant used for bitwise operations on the ball's direction
+
         font V7
         mov VC, 10
         draw VC, V1, 5
@@ -104,36 +106,45 @@ RGHT_DN:draw V3, V4, 5
         ret
 
 MOVBALL:draw V5, V6, 1
+        sneq VB, 1
+        jmpo PCJTBL
         jmpo MJMPTBL
 
-MJMPTBL:jmp BALL_M0
+MJMPTBL:jmp BMOVRGT
         jmp BALL_M1
         jmp BALL_M2
         jmp BALL_M3
-        jmp BALL_M4
+        jmp BMOVRGT
         jmp BALL_M5
         jmp BALL_M6
         jmp BALL_M7
-        jmp BALL_M8
+        jmp BMOVLFT
         jmp BALL_M9
         jmp BALL_MA
         jmp BALL_MB
-        jmp BALL_MC
+        jmp BMOVLFT
         jmp BALL_MD
         jmp BALL_ME
         jmp BALL_MF
 
-BALL_M0:seq VB, 1
-        jmp BMOVRGT
+PCJTBL: jmp RP_COLL
+        jmp RP_COLL
+        jmp RP_COLL
+        jmp RP_COLL
+        jmp RP_COLL
+        jmp RP_COLL
+        jmp RP_COLL
+        jmp RP_COLL
+        jmp LP_COLL
+        jmp LP_COLL
+        jmp LP_COLL
+        jmp LP_COLL
+        jmp LP_COLL
+        jmp LP_COLL
+        jmp LP_COLL
+        jmp LP_COLL
 
-        mov VB, 0
-        mov V0, 10 # 8 * 2
-        jmp BALL_M8
-
-BALL_M1:sneq VB, 1
-        jmp COLL_M1
-
-        seq VA, 3
+BALL_M1:seq VA, 3
         jmp PASS_M1
         sub V6, V1
         mov VA, 0
@@ -147,14 +158,7 @@ BALL_M1:sneq VB, 1
 PASS_M1:add VA, 1
         jmp BMOVRGT
 
-COLL_M1:mov VB, 0
-        mov V0, 12 # 9 * 2
-        jmp BALL_M9
-
-BALL_M2:sneq VB, 1
-        jmp COLL_M2
-
-        sub V6, V1
+BALL_M2:sub V6, V1
 
         seq V6, FF
         jmp BMOVRGT
@@ -162,14 +166,7 @@ BALL_M2:sneq VB, 1
         mov V0, 0C # 6 * 2
         jmp BALL_M6
 
-COLL_M2:mov VB, 0
-        mov V0, 14 # A * 2
-        jmp BALL_MA
-
-BALL_M3:sneq VB, 1
-        jmp COLL_M3
-
-        sub V6, V1
+BALL_M3:sub V6, V1
         seq VF, 00
         sub V6, V1
 
@@ -179,21 +176,7 @@ BALL_M3:sneq VB, 1
         mov V0, 0E # 7 * 2
         jmp BALL_M7
 
-COLL_M3:mov VB, 0
-        mov V0, 16 # B * 2
-        jmp BALL_MB
-
-BALL_M4:seq VB, 1
-        jmp BMOVRGT
-
-        mov VB, 0
-        mov V0, 18 # C * 2
-        jmp BALL_MC
-
-BALL_M5:sneq VB, 1
-        jmp COLL_M5
-
-        seq VA, 3
+BALL_M5:seq VA, 3
         jmp PASS_M5
         add V6, 1
         mov VA, 0
@@ -207,14 +190,7 @@ BALL_M5:sneq VB, 1
 PASS_M5:add VA, 1
         jmp BMOVRGT
 
-COLL_M5:mov VB, 0
-        mov V0, 1A # D * 2
-        jmp BALL_MD
-
-BALL_M6:sneq VB, 1
-        jmp COLL_M6
-
-        add V6, 1
+BALL_M6:add V6, 1
 
         seq V6, 20
         jmp BMOVRGT
@@ -222,14 +198,7 @@ BALL_M6:sneq VB, 1
         mov V0, 04 # 2 * 2
         jmp BALL_M2
 
-COLL_M6:mov VB, 0
-        mov V0, 1C # E * 2
-        jmp BALL_ME
-
-BALL_M7:sneq VB, 1
-        jmp COLL_M7
-
-        add V6, 2
+BALL_M7:add V6, 2
         sneq V6, 21
         jmp VC21_M7
         sneq V6, 21
@@ -241,9 +210,10 @@ VC21_M7:mov V6, 20
 VC20_M7:mov V0, 6 # 3 * 2
         jmp BALL_M3
 
-COLL_M7:mov VB, 0
-        mov V0, 1E # F * 2
-        jmp BALL_MF
+RP_COLL:mov VB, 0
+        rand V0, 1E
+        or V0, V9
+        jmpo MJMPTBL
 
 BMOVRGT:add V5, 01
         sneq V5, 40 # call L_SCORE if V5 = 64
@@ -254,18 +224,7 @@ BMOVRGT:add V5, 01
         mov VB, VF
         ret
 
-
-BALL_M8:seq VB, 1
-        jmp BMOVLFT
-
-        mov VB, 0
-        mov V0, 00
-        jmp BALL_M0
-
-BALL_M9:sneq VB, 1
-        jmp COLL_M9
-
-        seq VA, 3
+BALL_M9:seq VA, 3
         jmp PASS_M9
         sub V6, V1
         mov VA, 0
@@ -279,14 +238,7 @@ BALL_M9:sneq VB, 1
 PASS_M9:add VA, 1
         jmp BMOVLFT
 
-COLL_M9:mov VB, 0
-        mov V0, 02 # 1 * 2
-        jmp BALL_M1
-
-BALL_MA:sneq VB, 1
-        jmp COLL_MA
-
-        sub V6, V1
+BALL_MA:sub V6, V1
 
         seq V6, FF
         jmp BMOVLFT
@@ -294,14 +246,7 @@ BALL_MA:sneq VB, 1
         mov V0, 1C # E * 2
         jmp BALL_ME
 
-COLL_MA:mov VB, 0
-        mov V0, 04 # 2 * 2
-        jmp BALL_M2
-
-BALL_MB:sneq VB, 1
-        jmp COLL_MB
-
-        sub V6, V1
+BALL_MB:sub V6, V1
         seq VF, 00
         sub V6, V1
 
@@ -311,20 +256,7 @@ BALL_MB:sneq VB, 1
         mov V0, 1E # F * 2
         jmp BALL_MF
 
-COLL_MB:mov VB, 0
-        mov V0, 06 # 3 * 2
-        jmp BALL_M3
-
-BALL_MC:seq VB, 1
-        jmp BMOVLFT
-
-        mov VB, 0
-        mov V0, 08 # 4 * 2
-        jmp BALL_M4
-
-BALL_MD:sneq VB, 1
-        jmp COLL_MD
-        seq VA, 3
+BALL_MD:seq VA, 3
         jmp PASS_MD
         add V6, 1
         mov VA, 0
@@ -338,14 +270,7 @@ BALL_MD:sneq VB, 1
 PASS_MD:add VA, 1
         jmp BMOVLFT
 
-COLL_MD:mov VB, 0
-        mov V0, 0A # 5 * 2
-        jmp BALL_M5
-
-BALL_ME:sneq VB, 1
-        jmp COLL_ME
-
-        add V6, 1
+BALL_ME:add V6, 1
 
         seq V6, 20
         jmp BMOVLFT
@@ -353,14 +278,7 @@ BALL_ME:sneq VB, 1
         mov V0, 14 # A * 2
         jmp BALL_MA
 
-COLL_ME:mov VB, 0
-        mov V0, 0C # 6 * 2
-        jmp BALL_M6
-
-BALL_MF:sneq VB, 1
-        jmp COLL_MF
-
-        add V6, 2
+BALL_MF:add V6, 2
         sneq V6, 21
         jmp VC21_MF
         sneq V6, 21
@@ -372,9 +290,10 @@ VC21_MF:mov V6, 20
 VC20_MF:mov V0, 16 # B * 2
         jmp BALL_MB
 
-COLL_MF:mov VB, 0
-        mov V0, 0E # 7 * 2
-        jmp BALL_M7
+LP_COLL:mov VB, 0
+        rand V0, 1E
+        xor V0, V9
+        jmpo MJMPTBL
 
 BMOVLFT:sub V5, V1
         seq VF, 01 # skip if V5 > 0
