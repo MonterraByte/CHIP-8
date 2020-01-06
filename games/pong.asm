@@ -292,6 +292,7 @@ VC20_MF:mov V0, 16 # B * 2
 
 LP_COLL:mov VB, 0
         rand V0, 1E
+        or V0, V9
         xor V0, V9
         jmpo MJMPTBL
 
