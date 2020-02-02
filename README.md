@@ -17,6 +17,8 @@ then run it:
 
     python3 -m chip8 pong.out
 
+You can find a collection of other games to try [here](https://www.zophar.net/pdroms/chip8/chip-8-games-pack.html) ([archive link](https://web.archive.org/web/20190719223725/https://www.zophar.net/pdroms/chip8/chip-8-games-pack.html)).
+
 ## Possible improvements
 
 * Support for the Super-Chip extension to the CHIP-8
